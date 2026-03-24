@@ -1,0 +1,357 @@
+stock_name,ticker,market,exchange
+360 ONE WAM Ltd.,360,Indian,NSE
+ABB India Ltd.,ABB,Indian,NSE
+ACC Ltd.,ACC,Indian,NSE
+APL Apollo Tubes Ltd.,APL,Indian,NSE
+AU Small Finance Bank Ltd.,AU,Indian,NSE
+Adani Energy Solutions Ltd.,ADANI,Indian,NSE
+Aditya Birla Capital Ltd.,ADITYA,Indian,NSE
+Alkem Laboratories Ltd.,ALKEM,Indian,NSE
+Ambuja Cements Ltd.,AMBUJA,Indian,NSE
+Apollo Hospitals Enterprise Ltd.,APOLLO,Indian,NSE
+Ashok Leyland Ltd.,ASHOK,Indian,NSE
+Asian Paints Ltd.,ASIAN,Indian,NSE
+Astral Ltd.,ASTRAL,Indian,NSE
+Aurobindo Pharma Ltd.,AUROBINDO,Indian,NSE
+Avenue Supermarts Ltd.,AVENUE,Indian,NSE
+Axis Bank Ltd.,AXIS,Indian,NSE
+BSE Ltd.,BSE,Indian,NSE
+Bajaj Auto Ltd.,BAJAJ,Indian,NSE
+Bank of Baroda,BANK,Indian,NSE
+Bharat Dynamics Ltd.,BHARAT,Indian,NSE
+Bharti Airtel Ltd.,BHARTI,Indian,NSE
+Biocon Ltd.,BIOCON,Indian,NSE
+Blue Star Ltd.,BLUE,Indian,NSE
+Bosch Ltd.,BOSCH,Indian,NSE
+Britannia Industries Ltd.,BRITANNIA,Indian,NSE
+CG Power and Industrial Solutions Ltd.,CG,Indian,NSE
+Canara Bank,CANARA,Indian,NSE
+Cholamandalam Investment and Finance Company Ltd.,CHOLAMANDALAM,Indian,NSE
+Cipla Ltd.,CIPLA,Indian,NSE
+Coal India Ltd.,COAL,Indian,NSE
+Cochin Shipyard Ltd.,COCHIN,Indian,NSE
+Coforge Ltd.,COFORGE,Indian,NSE
+Colgate Palmolive (India) Ltd.,COLGATE,Indian,NSE
+Container Corporation of India Ltd.,CONTAINER,Indian,NSE
+Coromandel International Ltd.,COROMANDEL,Indian,NSE
+Cummins India Ltd.,CUMMINS,Indian,NSE
+DLF Ltd.,DLF,Indian,NSE
+Dabur India Ltd.,DABUR,Indian,NSE
+Divi's Laboratories Ltd.,DIVI'S,Indian,NSE
+Dixon Technologies (India) Ltd.,DIXON,Indian,NSE
+Dr. Reddy's Laboratories Ltd.,DR.,Indian,NSE
+Eicher Motors Ltd.,EICHER,Indian,NSE
+Eternal Ltd.,ETERNAL,Indian,NSE
+Exide Industries Ltd.,EXIDE,Indian,NSE
+FSN E-Commerce Ventures Ltd.,FSN,Indian,NSE
+Federal Bank Ltd.,FEDERAL,Indian,NSE
+Fortis Healthcare Ltd.,FORTIS,Indian,NSE
+GAIL (India) Ltd.,GAIL,Indian,NSE
+GMR Airports Ltd.,GMR,Indian,NSE
+Glenmark Pharmaceuticals Ltd.,GLENMARK,Indian,NSE
+Godfrey Phillips India Ltd.,GODFREY,Indian,NSE
+Godrej Consumer Products Ltd.,GODREJ,Indian,NSE
+Grasim Industries Ltd.,GRASIM,Indian,NSE
+HCL Technologies Ltd.,HCL,Indian,NSE
+HDFC Asset Management Company Ltd.,HDFC,Indian,NSE
+Havells India Ltd.,HAVELLS,Indian,NSE
+Hero MotoCorp Ltd.,HERO,Indian,NSE
+Hindalco Industries Ltd.,HINDALCO,Indian,NSE
+Hindustan Aeronautics Ltd.,HINDUSTAN,Indian,NSE
+Hitachi Energy India Ltd.,HITACHI,Indian,NSE
+Housing & Urban Development Corporation Ltd.,HOUSING,Indian,NSE
+Hyundai Motor India Ltd.,HYUNDAI,Indian,NSE
+ICICI Bank Ltd.,ICICI,Indian,NSE
+IDFC First Bank Ltd.,IDFC,Indian,NSE
+IRB Infrastructure Developers Ltd.,IRB,Indian,NSE
+ITC Hotels Ltd.,ITC,Indian,NSE
+Indian Bank,INDIAN,Indian,NSE
+Indraprastha Gas Ltd.,INDRAPRASTHA,Indian,NSE
+Indus Towers Ltd.,INDUS,Indian,NSE
+IndusInd Bank Ltd.,INDUSIND,Indian,NSE
+Info Edge (India) Ltd.,INFO,Indian,NSE
+Infosys Ltd.,INFOSYS,Indian,NSE
+InterGlobe Aviation Ltd.,INTERGLOBE,Indian,NSE
+JSW Energy Ltd.,JSW,Indian,NSE
+Jindal Steel Ltd.,JINDAL,Indian,NSE
+Jio Financial Services Ltd.,JIO,Indian,NSE
+Jubilant Foodworks Ltd.,JUBILANT,Indian,NSE
+KEI Industries Ltd.,KEI,Indian,NSE
+KPIT Technologies Ltd.,KPIT,Indian,NSE
+Kalyan Jewellers India Ltd.,KALYAN,Indian,NSE
+Kotak Mahindra Bank Ltd.,KOTAK,Indian,NSE
+L&T Finance Ltd.,L&T,Indian,NSE
+LIC Housing Finance Ltd.,LIC,Indian,NSE
+LTIMindtree Ltd.,LTIMINDTREE,Indian,NSE
+Larsen & Toubro Ltd.,LARSEN,Indian,NSE
+Life Insurance Corporation of India,LIFE,Indian,NSE
+Lodha Developers Ltd.,LODHA,Indian,NSE
+Lupin Ltd.,LUPIN,Indian,NSE
+MRF Ltd.,MRF,Indian,NSE
+Mahindra & Mahindra Financial Services Ltd.,MAHINDRA,Indian,NSE
+Mankind Pharma Ltd.,MANKIND,Indian,NSE
+Marico Ltd.,MARICO,Indian,NSE
+Maruti Suzuki India Ltd.,MARUTI,Indian,NSE
+Max Financial Services Ltd.,MAX,Indian,NSE
+Mazagoan Dock Shipbuilders Ltd.,MAZAGOAN,Indian,NSE
+Motilal Oswal Financial Services Ltd.,MOTILAL,Indian,NSE
+MphasiS Ltd.,MPHASIS,Indian,NSE
+Muthoot Finance Ltd.,MUTHOOT,Indian,NSE
+NHPC Ltd.,NHPC,Indian,NSE
+NMDC Ltd.,NMDC,Indian,NSE
+NTPC Green Energy Ltd.,NTPC,Indian,NSE
+National Aluminium Co. Ltd.,NATIONAL,Indian,NSE
+Nestle India Ltd.,NESTLE,Indian,NSE
+Oberoi Realty Ltd.,OBEROI,Indian,NSE
+Oil & Natural Gas Corporation Ltd.,OIL,Indian,NSE
+One 97 Communications Ltd.,ONE,Indian,NSE
+Oracle Financial Services Software Ltd.,ORACLE,Indian,NSE
+PB Fintech Ltd.,PB,Indian,NSE
+PI Industries Ltd.,PI,Indian,NSE
+Page Industries Ltd.,PAGE,Indian,NSE
+Patanjali Foods Ltd.,PATANJALI,Indian,NSE
+Persistent Systems Ltd.,PERSISTENT,Indian,NSE
+Phoenix Mills Ltd.,PHOENIX,Indian,NSE
+Pidilite Industries Ltd.,PIDILITE,Indian,NSE
+Polycab India Ltd.,POLYCAB,Indian,NSE
+Power Finance Corporation Ltd.,POWER,Indian,NSE
+Premier Energies Ltd.,PREMIER,Indian,NSE
+Prestige Estates Projects Ltd.,PRESTIGE,Indian,NSE
+Punjab National Bank,PUNJAB,Indian,NSE
+REC Ltd.,REC,Indian,NSE
+Rail Vikas Nigam Ltd.,RAIL,Indian,NSE
+Reliance Industries Ltd.,RELIANCE,Indian,NSE
+SBI Cards and Payment Services Ltd.,SBI,Indian,NSE
+SRF Ltd.,SRF,Indian,NSE
+Samvardhana Motherson International Ltd.,SAMVARDHANA,Indian,NSE
+Shree Cement Ltd.,SHREE,Indian,NSE
+Shriram Finance Ltd.,SHRIRAM,Indian,NSE
+Siemens Energy India Ltd.,SIEMENS,Indian,NSE
+Solar Industries India Ltd.,SOLAR,Indian,NSE
+Sona BLW Precision Forgings Ltd.,SONA,Indian,NSE
+State Bank of India,STATE,Indian,NSE
+Steel Authority of India Ltd.,STEEL,Indian,NSE
+Sun Pharmaceutical Industries Ltd.,SUN,Indian,NSE
+Supreme Industries Ltd.,SUPREME,Indian,NSE
+Suzlon Energy Ltd.,SUZLON,Indian,NSE
+Swiggy Ltd.,SWIGGY,Indian,NSE
+TVS Motor Company Ltd.,TVS,Indian,NSE
+Tata Communications Ltd.,TATA,Indian,NSE
+Tech Mahindra Ltd.,TECH,Indian,NSE
+Titan Company Ltd.,TITAN,Indian,NSE
+Torrent Pharmaceuticals Ltd.,TORRENT,Indian,NSE
+Trent Ltd.,TRENT,Indian,NSE
+Tube Investments of India Ltd.,TUBE,Indian,NSE
+UPL Ltd.,UPL,Indian,NSE
+UltraTech Cement Ltd.,ULTRATECH,Indian,NSE
+Union Bank of India,UNION,Indian,NSE
+United Spirits Ltd.,UNITED,Indian,NSE
+Varun Beverages Ltd.,VARUN,Indian,NSE
+Vedanta Ltd.,VEDANTA,Indian,NSE
+Vishal Mega Mart Ltd.,VISHAL,Indian,NSE
+Vodafone Idea Ltd.,VODAFONE,Indian,NSE
+Voltas Ltd.,VOLTAS,Indian,NSE
+Waaree Energies Ltd.,WAAREE,Indian,NSE
+Wipro Ltd.,WIPRO,Indian,NSE
+Yes Bank Ltd.,YES,Indian,NSE
+Zydus Lifesciences Ltd.,ZYDUS,Indian,NSE
+Nvidia,NVDA,US,US
+Apple Inc.,AAPL,US,US
+Microsoft,MSFT,US,US
+Amazon,AMZN,US,US
+Alphabet Inc. (Class A),GOOGL,US,US
+Alphabet Inc. (Class C),GOOG,US,US
+Meta Platforms,META,US,US
+Broadcom,AVGO,US,US
+"Tesla, Inc.",TSLA,US,US
+Berkshire Hathaway,BRK.B,US,US
+Walmart,WMT,US,US
+Lilly (Eli),LLY,US,US
+JPMorgan Chase,JPM,US,US
+ExxonMobil,XOM,US,US
+Visa Inc.,V,US,US
+Johnson & Johnson,JNJ,US,US
+Micron Technology,MU,US,US
+Mastercard,MA,US,US
+Costco,COST,US,US
+Oracle Corporation,ORCL,US,US
+Chevron Corporation,CVX,US,US
+Netflix,NFLX,US,US
+AbbVie,ABBV,US,US
+Palantir Technologies,PLTR,US,US
+Bank of America,BAC,US,US
+Procter & Gamble,PG,US,US
+Advanced Micro Devices,AMD,US,US
+Coca-Cola Company (The),KO,US,US
+Home Depot (The),HD,US,US
+Caterpillar Inc.,CAT,US,US
+Cisco,CSCO,US,US
+GE Aerospace,GE,US,US
+Lam Research,LRCX,US,US
+Applied Materials,AMAT,US,US
+Merck & Co.,MRK,US,US
+RTX Corporation,RTX,US,US
+Morgan Stanley,MS,US,US
+Philip Morris International,PM,US,US
+UnitedHealth Group,UNH,US,US
+Goldman Sachs,GS,US,US
+Wells Fargo,WFC,US,US
+T-Mobile US,TMUS,US,US
+GE Vernova,GEV,US,US
+IBM,IBM,US,US
+Linde plc,LIN,US,US
+McDonald's,MCD,US,US
+Intel,INTC,US,US
+Verizon,VZ,US,US
+PepsiCo,PEP,US,US
+American Express,AXP,US,US
+AT&T,T,US,US
+KLA Corporation,KLAC,US,US
+Citigroup,C,US,US
+Amgen,AMGN,US,US
+NextEra Energy,NEE,US,US
+Abbott Laboratories,ABT,US,US
+Salesforce,CRM,US,US
+Walt Disney Company (The),DIS,US,US
+Thermo Fisher Scientific,TMO,US,US
+TJX Companies,TJX,US,US
+Texas Instruments,TXN,US,US
+Gilead Sciences,GILD,US,US
+Intuitive Surgical,ISRG,US,US
+Charles Schwab Corporation,SCHW,US,US
+Arista Networks,ANET,US,US
+Amphenol,APH,US,US
+ConocoPhillips,COP,US,US
+Pfizer,PFE,US,US
+Boeing,BA,US,US
+Uber,UBER,US,US
+Deere & Company,DE,US,US
+Analog Devices,ADI,US,US
+AppLovin Corporation,APP,US,US
+BlackRock,BLK,US,US
+Lockheed Martin,LMT,US,US
+Honeywell,HON,US,US
+Union Pacific Corporation,UNP,US,US
+Qualcomm,QCOM,US,US
+Eaton Corporation,ETN,US,US
+Booking Holdings,BKNG,US,US
+Welltower,WELL,US,US
+Danaher Corporation,DHR,US,US
+Palo Alto Networks,PANW,US,US
+Stryker Corporation,SYK,US,US
+S&P Global,SPGI,US,US
+Lowe's,LOW,US,US
+Intuit,INTU,US,US
+Chubb Limited,CB,US,US
+Accenture,ACN,US,US
+Progressive Corporation,PGR,US,US
+Prologis,PLD,US,US
+Bristol Myers Squibb,BMY,US,US
+ServiceNow,NOW,US,US
+Vertex Pharmaceuticals,VRTX,US,US
+Parker Hannifin,PH,US,US
+Capital One,COF,US,US
+Medtronic,MDT,US,US
+HCA Healthcare,HCA,US,US
+CME Group,CME,US,US
+McKesson Corporation,MCK,US,US
+Altria,MO,US,US
+Corning Inc.,GLW,US,US
+Starbucks,SBUX,US,US
+Sandisk Corporation,SNDK,US,US
+Southern Company,SO,US,US
+Comcast,CMCSA,US,US
+Newmont,NEM,US,US
+CrowdStrike,CRWD,US,US
+Boston Scientific,BSX,US,US
+Constellation Energy,CEG,US,US
+Dell Technologies,DELL,US,US
+Adobe Inc.,ADBE,US,US
+Northrop Grumman,NOC,US,US
+Western Digital,WDC,US,US
+Duke Energy,DUK,US,US
+Equinix,EQIX,US,US
+General Dynamics,GD,US,US
+Waste Management,WM,US,US
+Howmet Aerospace,HWM,US,US
+Seagate Technology,STX,US,US
+CVS Health,CVS,US,US
+Trane Technologies,TT,US,US
+Intercontinental Exchange,ICE,US,US
+Williams Companies,WMB,US,US
+Blackstone Inc.,BX,US,US
+"Marsh & McLennan Companies, Inc.",MRSH,US,US
+Marriott International,MAR,US,US
+FedEx,FDX,US,US
+Automatic Data Processing,ADP,US,US
+Quanta Services,PWR,US,US
+American Tower,AMT,US,US
+United Parcel Service,UPS,US,US
+PNC Financial Services,PNC,US,US
+Synopsys,SNPS,US,US
+KKR,KKR,US,US
+U.S. Bancorp,USB,US,US
+Johnson Controls,JCI,US,US
+BNY Mellon,BK,US,US
+Cadence Design Systems,CDNS,US,US
+"Nike, Inc.",NKE,US,US
+Regeneron Pharmaceuticals,REGN,US,US
+Moody's Corporation,MCO,US,US
+Airbnb,ABNB,US,US
+Sherwin-Williams,SHW,US,US
+Motorola Solutions,MSI,US,US
+Freeport-McMoRan,FCX,US,US
+EOG Resources,EOG,US,US
+3M,MMM,US,US
+Illinois Tool Works,ITW,US,US
+Cummins,CMI,US,US
+O'Reilly Auto Parts,ORLY,US,US
+Kinder Morgan,KMI,US,US
+Ecolab,ECL,US,US
+Monster Beverage,MNST,US,US
+Mondelez International,MDLZ,US,US
+Emerson Electric,EMR,US,US
+Cintas,CTAS,US,US
+Valero Energy,VLO,US,US
+Royal Caribbean Group,RCL,US,US
+CSX Corporation,CSX,US,US
+Phillips 66,PSX,US,US
+Schlumberger,SLB,US,US
+Aon,AON,US,US
+Cigna,CI,US,US
+Marathon Petroleum,MPC,US,US
+Ross Stores,ROST,US,US
+Colgate-Palmolive,CL,US,US
+DoorDash,DASH,US,US
+Warner Bros. Discovery,WBD,US,US
+American Electric Power,AEP,US,US
+Republic Services,RSG,US,US
+CRH plc,CRH,US,US
+Hilton Worldwide,HLT,US,US
+TransDigm Group,TDG,US,US
+L3Harris,LHX,US,US
+General Motors,GM,US,US
+Apollo Global Management,APO,US,US
+Elevance Health,ELV,US,US
+Travelers Companies (The),TRV,US,US
+"Robinhood Markets, Inc.",HOOD,US,US
+Cencora,COR,US,US
+Norfolk Southern Railway,NSC,US,US
+Air Products,APD,US,US
+Fortinet,FTNT,US,US
+Simon Property Group,SPG,US,US
+Sempra,SRE,US,US
+Occidental Petroleum,OXY,US,US
+Baker Hughes,BKR,US,US
+Digital Realty,DLR,US,US
+Paccar,PCAR,US,US
+TE Connectivity,TEL,US,US
+Realty Income,O,US,US
+ONEOK,OKE,US,US
+Arthur J. Gallagher & Co.,AJG,US,US
+Aflac,AFL,US,US
+Truist Financial,TFC,US,US
+Ciena Corporation,CIEN,US,US
+AutoZone,AZO,US,US
+Diamondback Energy,FANG,US,US
+Allstate,ALL,US,US
