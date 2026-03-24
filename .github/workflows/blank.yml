@@ -1,0 +1,19 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - frontend-dev
+      - backend-dev
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Run Message
+        run: echo "GitHub Actions working"
