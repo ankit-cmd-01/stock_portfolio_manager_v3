@@ -1,0 +1,212 @@
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-base: #0a0e1a;
+  --bg-base-rgb: 10 14 26;
+  --bg-surface: #111827;
+  --bg-surface-rgb: 17 24 39;
+  --bg-elevated: #1a2235;
+  --bg-elevated-rgb: 26 34 53;
+  --border: #1e2d45;
+  --border-rgb: 30 45 69;
+  --accent-primary: #00d4ff;
+  --accent-primary-rgb: 0 212 255;
+  --accent-green: #00e676;
+  --accent-green-rgb: 0 230 118;
+  --accent-red: #ff3d57;
+  --accent-red-rgb: 255 61 87;
+  --accent-gold: #ffb300;
+  --accent-gold-rgb: 255 179 0;
+  --text-primary: #e8f0fe;
+  --text-primary-rgb: 232 240 254;
+  --text-muted: #6b7fa3;
+  --text-muted-rgb: 107 127 163;
+  --text-dim: #3a4a6b;
+  --text-dim-rgb: 58 74 107;
+  --glow-cyan: 0 0 20px rgba(0, 212, 255, 0.3);
+  --glow-green: 0 0 15px rgba(0, 230, 118, 0.25);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply m-0 bg-base font-body text-text antialiased;
+    background-image:
+      radial-gradient(circle at top left, rgba(0, 212, 255, 0.12), transparent 24%),
+      radial-gradient(circle at 82% 12%, rgba(0, 230, 118, 0.08), transparent 18%),
+      linear-gradient(180deg, #0a0e1a 0%, #0d1322 48%, #091019 100%);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .app-shell {
+    @apply min-h-screen;
+  }
+
+  .panel {
+    @apply rounded-panel border border-border bg-surface shadow-panel;
+  }
+
+  .panel-elevated {
+    @apply rounded-modal border border-border bg-elevated shadow-panel;
+  }
+
+  .glass-line {
+    @apply border border-white/5 bg-white/[0.02];
+  }
+
+  .text-financial {
+    @apply font-mono tabular-nums tracking-tight;
+  }
+
+  .cyber-grid {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cyber-grid::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 100% 56px, 56px 100%;
+    pointer-events: none;
+  }
+
+  .hero-mesh {
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(0, 212, 255, 0.16), transparent 22%),
+      radial-gradient(circle at 75% 24%, rgba(0, 230, 118, 0.1), transparent 18%),
+      radial-gradient(circle at 55% 65%, rgba(255, 179, 0, 0.08), transparent 16%);
+  }
+
+  .metric-glow {
+    box-shadow: var(--glow-cyan);
+  }
+
+  .positive-glow {
+    box-shadow: var(--glow-green);
+  }
+
+  .skeleton {
+    background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.04) 0%,
+      rgba(255, 255, 255, 0.11) 50%,
+      rgba(255, 255, 255, 0.04) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.6s linear infinite;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 212, 255, 0.35) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(0, 212, 255, 0.35);
+    border-radius: 999px;
+  }
+
+  .marquee-frame:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  .marquee-track {
+    animation: marquee-scroll var(--marquee-duration, 26s) linear infinite;
+    will-change: transform;
+  }
+
+  .animate-page-slide-next {
+    animation: page-slide-next 260ms ease-out both;
+  }
+
+  .animate-page-slide-prev {
+    animation: page-slide-prev 260ms ease-out both;
+  }
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes page-slide-next {
+  from {
+    opacity: 0;
+    transform: translateX(18px) scale(0.985);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes page-slide-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-18px) scale(0.985);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+    transform: none;
+  }
+
+  .animate-page-slide-next,
+  .animate-page-slide-prev {
+    animation: none;
+    transform: none;
+    filter: none;
+  }
+}

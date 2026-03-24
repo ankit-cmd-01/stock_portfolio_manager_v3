@@ -1,0 +1,30 @@
+# Python
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Django / backend
+Backend/ai_stockanalysis/.env
+Backend/ai_stockanalysis/.cache/
+Backend/ai_stockanalysis/media/
+*.sqlite3
+*.session
+
+# Node / frontend
+**/node_modules/
+Frontend/dist/
+Frontend/.vite/
+Frontend/.env
+Frontend/.env.local
+Frontend/.env.*.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
