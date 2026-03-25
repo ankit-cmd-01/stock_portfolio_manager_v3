@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "portfolio",
     "stock_master",
     "user_stock",
+    "chatbot",
     "metals",
     "advanced",
 ]

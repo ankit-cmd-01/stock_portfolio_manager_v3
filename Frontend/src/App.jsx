@@ -14,6 +14,7 @@ import {
 import Sidebar from "./components/Sidebar";
 import ProfileSettingsDrawer from "./components/ProfileSettingsDrawer";
 import ToastViewport from "./components/ToastViewport";
+import ChatWidget from "./components/ChatWidget";
 import { AuthProvider } from "./context/AuthContext";
 import { MetalsProvider } from "./context/MetalsContext";
 import { useAuth } from "./hooks/useAuth";
@@ -79,7 +80,7 @@ function ProtectedLayout({ onToast }) {
             </div>
           ) : null}
 
-          <main className="animate-routeFade px-4 py-5 lg:px-8 lg:py-8">
+          <main className="animate-routeFade px-4 py-4 lg:px-6 lg:py-6">
             <Outlet context={outletContext} />
           </main>
 
@@ -98,7 +99,7 @@ function AppRoutes({ onToast }) {
   const location = useLocation();
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [location.pathname]);
 
   return (
@@ -139,7 +140,10 @@ function AppInner() {
     <>
       <BrowserRouter>
         <MetalsProvider>
-          <AppRoutes onToast={setToast} />
+          <div className="desktop-density">
+            <AppRoutes onToast={setToast} />
+            <ChatWidget />
+          </div>
         </MetalsProvider>
       </BrowserRouter>
       <ToastViewport toast={toast} onClose={() => setToast(null)} />

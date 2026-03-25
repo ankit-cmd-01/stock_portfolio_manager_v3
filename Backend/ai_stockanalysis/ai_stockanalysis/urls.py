@@ -33,6 +33,7 @@ urlpatterns = [
     path("api/portfolio/", include("portfolio.forecast_urls")),
     path("stock_master/", include("stock_master.urls")),
     path("user_stocks/", include("user_stock.urls")),
+    path("api/chat/", include("chatbot.urls")),
     path("api/metals/", include("metals.urls")),
     path("api/advanced/", include("advanced.urls")),
 ]

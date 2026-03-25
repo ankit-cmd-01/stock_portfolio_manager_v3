@@ -24,22 +24,22 @@ const resolveProfilePic = (value) => {
 export default function Sidebar({ user, onLogout, onOpenProfile, mobile = false }) {
   return (
     <aside
-      className={`w-60 shrink-0 border-r border-border bg-slate-950 px-4 py-6 ${
+      className={`w-56 shrink-0 border-r border-border bg-slate-950 px-3 py-5 ${
         mobile ? "flex w-full flex-col" : "hidden lg:flex lg:flex-col"
       }`}
     >
-      <div className="mb-8 flex items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-panel border border-primary/30 bg-primary/10 font-display text-lg tracking-widest text-primary">
+      <div className="mb-7 flex items-center gap-3">
+        <div className="flex h-11 w-11 items-center justify-center rounded-panel border border-primary/30 bg-primary/10 font-display text-base tracking-widest text-primary">
           AS
         </div>
         <div>
-          <p className="text-xs uppercase tracking-widest text-muted">AI StockAnalysis</p>
-          <h1 className="font-display text-xl text-text">Terminal</h1>
+          <p className="text-[11px] uppercase tracking-[0.22em] text-muted">AI StockAnalysis</p>
+          <h1 className="font-display text-[1.75rem] leading-none text-text">Terminal</h1>
         </div>
       </div>
 
-      <div className="panel relative mb-8 bg-white/5 p-4">
-        <p className="text-xs uppercase tracking-widest text-muted">Investor</p>
+      <div className="panel relative mb-7 bg-white/5 p-4">
+        <p className="text-[11px] uppercase tracking-[0.22em] text-muted">Investor</p>
         <div className="mt-3 flex items-center gap-3">
           {user?.profile_pic ? (
             <img
@@ -53,19 +53,19 @@ export default function Sidebar({ user, onLogout, onOpenProfile, mobile = false 
             </div>
           )}
           <div className="min-w-0">
-            <p className="truncate font-semibold text-text">
+            <p className="truncate text-[1.05rem] font-semibold leading-6 text-text">
               {user?.first_name ? `${user.first_name} ${user.last_name || ""}` : "Guest Investor"}
             </p>
-            <p className="truncate text-xs text-muted">{user?.email || "Sign in to sync"}</p>
+            <p className="truncate text-[12px] text-muted">{user?.email || "Sign in to sync"}</p>
           </div>
         </div>
         <button
           type="button"
           onClick={onOpenProfile}
-          className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-panel border border-border bg-base text-muted transition hover:border-primary/30 hover:text-text"
+          className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-panel border border-border bg-base text-muted transition hover:border-primary/30 hover:text-text"
           aria-label="Edit profile"
         >
-          <PencilLine size={16} />
+          <PencilLine size={15} />
         </button>
       </div>
 
@@ -75,7 +75,7 @@ export default function Sidebar({ user, onLogout, onOpenProfile, mobile = false 
             key={label}
             to={to}
             className={({ isActive }) =>
-              `group relative flex items-center gap-3 rounded-panel px-4 py-3 text-sm font-semibold transition ${
+              `group relative flex items-center gap-3 rounded-panel px-4 py-3 text-[0.98rem] font-semibold transition ${
                 isActive
                   ? "bg-primary/12 text-text shadow-cyan"
                   : "text-muted hover:bg-white/5 hover:text-text"
@@ -87,7 +87,7 @@ export default function Sidebar({ user, onLogout, onOpenProfile, mobile = false 
                 {isActive ? (
                   <span className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-primary" />
                 ) : null}
-                <Icon size={18} className={isActive ? "text-primary" : ""} />
+                <Icon size={17} className={isActive ? "text-primary" : ""} />
                 <span>{label}</span>
               </>
             )}
@@ -97,13 +97,13 @@ export default function Sidebar({ user, onLogout, onOpenProfile, mobile = false 
         {featureItems.map(({ label, hint, icon: Icon, locked }) => (
           <div
             key={label}
-            className="group relative flex items-center justify-between rounded-panel border border-border bg-white/5 px-4 py-3 text-sm text-muted"
+            className="group relative flex items-center justify-between rounded-panel border border-border bg-white/5 px-4 py-3 text-[0.96rem] text-muted"
           >
             <div className="flex items-center gap-3">
-              <Icon size={18} />
+              <Icon size={17} />
               <span className="font-semibold">{label}</span>
             </div>
-            <span className="rounded-chip bg-white/10 px-2 py-1 text-xs uppercase tracking-widest text-primary">
+            <span className="rounded-chip bg-white/10 px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-primary">
               {hint}
             </span>
             {locked ? <Lock size={12} className="absolute right-3 top-3 text-muted" /> : null}
@@ -116,9 +116,9 @@ export default function Sidebar({ user, onLogout, onOpenProfile, mobile = false 
         <button
           type="button"
           onClick={onOpenProfile}
-          className="flex w-full items-center gap-3 rounded-panel px-4 py-3 text-sm font-semibold text-muted transition hover:bg-white/5 hover:text-text"
+          className="flex w-full items-center gap-3 rounded-panel px-4 py-3 text-[0.98rem] font-semibold text-muted transition hover:bg-white/5 hover:text-text"
         >
-          <Settings2 size={18} />
+          <Settings2 size={17} />
           <span>Profile Settings</span>
         </button>
       </nav>
@@ -126,9 +126,9 @@ export default function Sidebar({ user, onLogout, onOpenProfile, mobile = false 
       <button
         type="button"
         onClick={onLogout}
-        className="mt-auto flex items-center gap-3 rounded-panel border border-border px-4 py-3 text-sm font-semibold text-muted transition hover:border-primary/30 hover:text-text"
+        className="mt-auto flex items-center gap-3 rounded-panel border border-border px-4 py-3 text-[0.98rem] font-semibold text-muted transition hover:border-primary/30 hover:text-text"
       >
-        <LogOut size={18} />
+        <LogOut size={17} />
         <span>Logout</span>
       </button>
     </aside>

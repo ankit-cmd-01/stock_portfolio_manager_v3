@@ -114,16 +114,6 @@ export default function Dashboard() {
     setPortfolioPage((current) => Math.min(current, Math.max(0, portfolioPageCount - 1)));
   }, [portfolioPageCount]);
 
-  useEffect(() => {
-    if (location.pathname !== "/portfolios") {
-      return;
-    }
-
-    window.requestAnimationFrame(() => {
-      document.getElementById("portfolio-cards")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  }, [location.pathname]);
-
   const handlePortfolioPageChange = (nextPage) => {
     if (nextPage === currentPortfolioPage) {
       return;
@@ -220,18 +210,18 @@ export default function Dashboard() {
   };
 
   const portfolioCardsSection = (
-    <section className="space-y-5">
+    <section className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-widest text-muted">Section A</p>
-          <h2 className="font-display text-3xl text-text">Portfolio Cards</h2>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-muted">Section A</p>
+          <h2 className="font-display text-[2rem] text-text">Portfolio Cards</h2>
         </div>
         <div className="flex items-center gap-3">
           {portfolioPager}
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
-            className="inline-flex items-center gap-2 rounded-panel bg-primary px-4 py-3 text-sm font-semibold text-slate-950 transition hover:shadow-cyan"
+            className="inline-flex items-center gap-2 rounded-panel bg-primary px-4 py-2.5 text-[0.96rem] font-semibold text-slate-950 transition hover:shadow-cyan"
           >
             <Plus size={16} />
             New Portfolio
@@ -263,22 +253,22 @@ export default function Dashboard() {
                   key={portfolio.id}
                   type="button"
                   onClick={() => navigate(`/portfolio/${portfolio.id}`)}
-                  className="panel hover-panel animate-floatUp p-5 text-left transition hover:shadow-cyan"
+                  className="panel hover-panel animate-floatUp p-4 text-left transition hover:shadow-cyan"
                   style={{ animationDelay: `${index * 90}ms` }}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="text-xs uppercase tracking-widest text-muted">Portfolio</p>
-                      <h3 className="mt-2 font-display text-2xl text-text">{portfolio.title}</h3>
+                      <p className="text-[11px] uppercase tracking-[0.2em] text-muted">Portfolio</p>
+                      <h3 className="mt-2 font-display text-[1.6rem] text-text">{portfolio.title}</h3>
                     </div>
                     <span className="rounded-chip bg-primary/10 px-3 py-1 text-xs text-primary">
                       {getPortfolioStocks(portfolio.id).length} stocks
                     </span>
                   </div>
-                  <p className="mt-3 text-sm leading-7 text-muted">
+                  <p className="mt-3 text-[0.96rem] leading-7 text-muted">
                     {portfolio.description || "A clean basket for conviction-based tracking."}
                   </p>
-                  <p className="mt-5 text-xs uppercase tracking-widest text-muted">
+                  <p className="mt-5 text-[11px] uppercase tracking-[0.18em] text-muted">
                     Last updated {formatRelativeMinutes(portfolio.modified_at)}
                   </p>
 
@@ -301,22 +291,22 @@ export default function Dashboard() {
       className={
         isPortfolioPage
           ? "space-y-8 overflow-x-hidden"
-          : "grid gap-5 overflow-x-hidden lg:h-[calc(100vh-7.5rem)] lg:grid-rows-[auto_auto_1fr]"
+          : "space-y-4 overflow-x-hidden"
       }
     >
       {isPortfolioPage ? (
         portfolioCardsSection
       ) : (
         <>
-          <section className="panel relative overflow-hidden p-5 lg:p-6">
+          <section className="panel relative overflow-hidden p-5 sm:p-6 xl:p-7">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,212,255,0.12),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(0,230,118,0.08),transparent_22%)]" />
-            <div className="relative z-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-              <div className="max-w-3xl">
-                <p className="text-xs uppercase tracking-[0.3em] text-primary">Control Room</p>
-                <h1 className="mt-3 font-display text-4xl leading-none text-text xl:text-5xl">
+            <div className="relative z-10 grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.85fr)] xl:items-end">
+              <div className="min-w-0 max-w-3xl">
+                <p className="text-[11px] uppercase tracking-[0.28em] text-primary">Control Room</p>
+                <h1 className="mt-3 max-w-[15ch] break-words font-display text-[clamp(2.2rem,4vw,3.8rem)] leading-[0.94] text-text">
                   Portfolio intelligence that fits in one glance.
                 </h1>
-                <p className="mt-4 max-w-2xl text-sm leading-7 text-muted lg:text-base">
+                <p className="mt-4 max-w-2xl break-words text-[0.98rem] leading-7 text-muted">
                   Track your strongest movers, latest portfolio baskets, and valuation signals without hunting through
                   tables or side-scroll panels.
                 </p>
@@ -324,14 +314,14 @@ export default function Dashboard() {
                   <button
                     type="button"
                     onClick={() => setDrawerOpen(true)}
-                    className="inline-flex items-center gap-2 rounded-panel bg-primary px-4 py-3 text-sm font-semibold text-slate-950 transition hover:shadow-cyan"
+                    className="inline-flex items-center gap-2 rounded-panel bg-primary px-4 py-2.5 text-[0.96rem] font-semibold text-slate-950 transition hover:shadow-cyan"
                   >
                     <Plus size={16} />
                     New Portfolio
                   </button>
                   <Link
                     to="/portfolios"
-                    className="inline-flex items-center gap-2 rounded-panel border border-border bg-white/5 px-4 py-3 text-sm font-semibold text-text transition hover:border-primary/30 hover:text-primary"
+                    className="inline-flex items-center gap-2 rounded-panel border border-border bg-white/5 px-4 py-2.5 text-[0.96rem] font-semibold text-text transition hover:border-primary/30 hover:text-primary"
                   >
                     Open portfolio workspace
                     <ChevronRight size={16} />
@@ -339,21 +329,21 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[420px]">
-                <div className="rounded-panel border border-white/5 bg-white/[0.03] p-4">
-                  <p className="text-xs uppercase tracking-widest text-muted">Tracked universe</p>
-                  <p className="mt-2 font-display text-3xl text-text">{stocks.length}</p>
-                  <p className="mt-1 text-xs text-muted">Live stocks across all active baskets</p>
+              <div className="grid gap-3 sm:grid-cols-3 xl:w-full xl:max-w-[38rem]">
+                <div className="min-w-0 rounded-panel border border-white/5 bg-white/[0.03] p-4">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-muted">Tracked universe</p>
+                  <p className="mt-2 break-words font-display text-[clamp(1.8rem,2.5vw,2.4rem)] text-text">{stocks.length}</p>
+                  <p className="mt-1 break-words text-[0.92rem] leading-6 text-muted">Live stocks across all active baskets</p>
                 </div>
-                <div className="rounded-panel border border-white/5 bg-white/[0.03] p-4">
-                  <p className="text-xs uppercase tracking-widest text-muted">Recent leaders</p>
-                  <p className="mt-2 font-display text-3xl text-profit">{bestPerforming ? bestPerforming.changePct.toFixed(2) : "0.00"}%</p>
-                  <p className="mt-1 truncate text-xs text-muted">{bestPerforming?.ticker || "Waiting for synced moves"}</p>
+                <div className="min-w-0 rounded-panel border border-white/5 bg-white/[0.03] p-4">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-muted">Recent leaders</p>
+                  <p className="mt-2 break-words font-display text-[clamp(1.8rem,2.5vw,2.4rem)] text-profit">{bestPerforming ? bestPerforming.changePct.toFixed(2) : "0.00"}%</p>
+                  <p className="mt-1 truncate text-[0.92rem] text-muted">{bestPerforming?.ticker || "Waiting for synced moves"}</p>
                 </div>
-                <div className="rounded-panel border border-white/5 bg-white/[0.03] p-4">
-                  <p className="text-xs uppercase tracking-widest text-muted">Value signal</p>
-                  <p className="mt-2 font-display text-3xl text-gold">{lowestPe ? lowestPe.peRatio.toFixed(2) : "--"}</p>
-                  <p className="mt-1 truncate text-xs text-muted">{lowestPe?.ticker || "PE sync pending"}</p>
+                <div className="min-w-0 rounded-panel border border-white/5 bg-white/[0.03] p-4">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-muted">Value signal</p>
+                  <p className="mt-2 break-words font-display text-[clamp(1.8rem,2.5vw,2.4rem)] text-gold">{lowestPe ? lowestPe.peRatio.toFixed(2) : "--"}</p>
+                  <p className="mt-1 truncate text-[0.92rem] text-muted">{lowestPe?.ticker || "PE sync pending"}</p>
                 </div>
               </div>
             </div>
@@ -376,12 +366,12 @@ export default function Dashboard() {
             />
           </section>
 
-          <section className="grid gap-5 lg:min-h-0 lg:grid-cols-[1.08fr_0.92fr]">
-            <div className="panel flex min-h-0 flex-col p-5 lg:p-6">
+          <section className="grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
+            <div className="panel flex flex-col overflow-hidden p-5 lg:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs uppercase tracking-widest text-muted">Section A</p>
-                  <h2 className="font-display text-3xl text-text">Portfolio Snapshot</h2>
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-muted">Section A</p>
+                  <h2 className="break-words font-display text-[2rem] text-text">Portfolio Snapshot</h2>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="rounded-chip bg-white/5 px-3 py-2 text-xs uppercase tracking-widest text-muted">
@@ -397,7 +387,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="mt-5 grid flex-1 gap-4 lg:min-h-0">
+              <div className="mt-5 grid gap-4">
                 {portfolioLoading ? (
                   Array.from({ length: 3 }).map((_, index) => <SkeletonBlock key={index} className="h-28 w-full" />)
                 ) : featuredPortfolios.length === 0 ? (
@@ -427,17 +417,17 @@ export default function Dashboard() {
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <p className="text-xs uppercase tracking-widest text-muted">Portfolio</p>
-                            <h3 className="mt-2 truncate font-display text-2xl text-text">{portfolio.title}</h3>
+                            <p className="text-[11px] uppercase tracking-[0.18em] text-muted">Portfolio</p>
+                            <h3 className="mt-2 break-words font-display text-[1.55rem] text-text">{portfolio.title}</h3>
                           </div>
                           <span className="rounded-chip bg-primary/10 px-3 py-1 text-xs text-primary">
                             {portfolioStocks.length} stocks
                           </span>
                         </div>
-                        <p className="mt-3 text-sm leading-6 text-muted">
+                        <p className="mt-3 break-words text-[0.96rem] leading-6 text-muted">
                           {portfolio.description || "A clean basket for conviction-based tracking."}
                         </p>
-                        <div className="mt-4 flex flex-wrap items-center gap-3 text-xs uppercase tracking-widest text-muted">
+                        <div className="mt-4 flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.16em] text-muted">
                           <span>Updated {formatRelativeMinutes(portfolio.modified_at)}</span>
                           <span className="h-1 w-1 rounded-full bg-border" />
                           <span>
@@ -451,17 +441,17 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="grid gap-5 lg:min-h-0 lg:grid-rows-[1fr_auto]">
-              <div className="panel flex min-h-0 flex-col p-5 lg:p-6">
+            <div className="grid gap-5">
+              <div className="panel flex flex-col overflow-hidden p-5 lg:p-6">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs uppercase tracking-widest text-muted">Section B</p>
-                    <h2 className="font-display text-3xl text-text">Recent Stocks</h2>
+                    <p className="text-[11px] uppercase tracking-[0.2em] text-muted">Section B</p>
+                    <h2 className="break-words font-display text-[2rem] text-text">Recent Stocks</h2>
                   </div>
                   {error ? <span className="text-sm text-loss">{error}</span> : null}
                 </div>
 
-                <div className="mt-5 grid flex-1 gap-3 lg:min-h-0">
+                <div className="mt-5 grid gap-3">
                   {stockLoading ? (
                     Array.from({ length: 4 }).map((_, index) => <SkeletonBlock key={index} className="h-20 w-full" />)
                   ) : recentRows.length === 0 ? (
@@ -477,15 +467,15 @@ export default function Dashboard() {
                         className="grid grid-cols-[minmax(0,1.2fr)_auto_auto] items-center gap-3 rounded-panel border border-white/5 bg-white/[0.03] px-4 py-4 transition hover:border-primary/30 hover:bg-white/[0.05]"
                       >
                         <div className="min-w-0">
-                          <p className="truncate font-display text-xl text-text">{row.ticker}</p>
-                          <p className="truncate text-sm text-muted">{row.company_name}</p>
+                          <p className="truncate font-display text-[1.2rem] text-text">{row.ticker}</p>
+                          <p className="truncate text-[0.95rem] text-muted">{row.company_name}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-mono text-sm text-text">{formatPrice(row.close || 0, 2)}</p>
-                          <p className="mt-1 text-xs uppercase tracking-widest text-muted">{row.peRatio ? `PE ${row.peRatio.toFixed(2)}` : "PE --"}</p>
+                          <p className="font-mono text-[0.95rem] text-text">{formatPrice(row.close || 0, 2)}</p>
+                          <p className="mt-1 text-[11px] uppercase tracking-[0.16em] text-muted">{row.peRatio ? `PE ${row.peRatio.toFixed(2)}` : "PE --"}</p>
                         </div>
                         <div
-                          className={`inline-flex min-w-[88px] items-center justify-end gap-1 font-mono text-sm ${
+                          className={`inline-flex min-w-[88px] items-center justify-end gap-1 font-mono text-[0.95rem] ${
                             row.changePct >= 0 ? "text-profit" : "text-loss"
                           }`}
                         >
@@ -498,11 +488,11 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="panel p-5">
+              <div className="panel overflow-hidden p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs uppercase tracking-widest text-muted">Pulse</p>
-                    <h3 className="mt-2 font-display text-2xl text-text">Trend Strip</h3>
+                    <p className="text-[11px] uppercase tracking-[0.2em] text-muted">Pulse</p>
+                    <h3 className="mt-2 break-words font-display text-[1.75rem] text-text">Trend Strip</h3>
                   </div>
                   <span className="inline-flex items-center gap-2 rounded-chip bg-primary/10 px-3 py-1 text-xs text-primary">
                     <TrendingUp size={14} />
@@ -515,10 +505,10 @@ export default function Dashboard() {
                     <div key={row.id} className="rounded-panel border border-white/5 bg-white/[0.03] p-3">
                       <div className="flex items-center justify-between gap-2">
                         <div className="min-w-0">
-                          <p className="truncate font-display text-lg text-text">{row.ticker}</p>
-                          <p className="truncate text-xs uppercase tracking-widest text-muted">{row.portfolio_title}</p>
+                          <p className="truncate font-display text-[1.05rem] text-text">{row.ticker}</p>
+                          <p className="truncate text-[11px] uppercase tracking-[0.16em] text-muted">{row.portfolio_title}</p>
                         </div>
-                        <span className={`text-xs font-semibold ${peColor(row.peRatio)}`}>{row.peRatio ? `PE ${row.peRatio.toFixed(1)}` : "PE --"}</span>
+                        <span className={`text-[11px] font-semibold ${peColor(row.peRatio)}`}>{row.peRatio ? `PE ${row.peRatio.toFixed(1)}` : "PE --"}</span>
                       </div>
                       <div className="mt-3 h-12">
                         <Sparkline

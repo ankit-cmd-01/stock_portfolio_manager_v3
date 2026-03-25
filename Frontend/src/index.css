@@ -66,6 +66,12 @@
     min-height: 100vh;
     overflow-x: hidden;
   }
+
+  @media (min-width: 1400px) {
+    html {
+      font-size: 14px;
+    }
+  }
 }
 
 @layer components {
@@ -161,6 +167,21 @@
 
   .animate-page-slide-prev {
     animation: page-slide-prev 260ms ease-out both;
+  }
+
+  .desktop-density {
+    min-height: 100vh;
+    overflow-x: clip;
+  }
+}
+
+@supports (zoom: 1) {
+  @media (min-width: 1400px) {
+    .desktop-density {
+      zoom: 0.84;
+      width: calc(100% / 0.84);
+      min-height: calc(100vh / 0.84);
+    }
   }
 }
 

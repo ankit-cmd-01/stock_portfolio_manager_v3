@@ -30,14 +30,14 @@ export default function StatsCard({ label, value, hint, accent = "text-primary" 
   }, [target, value]);
 
   return (
-    <article className="panel hover-panel cyber-grid p-5">
-      <p className="text-xs uppercase tracking-widest text-muted">{label}</p>
-      <div className="mt-4 flex items-end justify-between gap-4">
-        <strong className={`font-display text-4xl leading-none ${accent}`}>
+    <article className="panel hover-panel cyber-grid overflow-hidden p-4">
+      <p className="break-words text-[11px] uppercase tracking-[0.2em] text-muted">{label}</p>
+      <div className="mt-4 flex min-w-0 items-end justify-between gap-4">
+        <strong className={`break-words font-display text-[clamp(2rem,3vw,2.65rem)] leading-[0.9] ${accent}`}>
           {displayValue}
         </strong>
       </div>
-      <p className="mt-3 text-sm leading-6 text-muted">{hint}</p>
+      <p className="mt-3 break-words text-[0.98rem] leading-7 text-muted">{hint}</p>
     </article>
   );
 }
