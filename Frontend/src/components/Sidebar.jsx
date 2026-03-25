@@ -21,25 +21,34 @@ const resolveProfilePic = (value) => {
   return resolveBackendUrl(value);
 };
 
+function SectionLabel({ children }) {
+  return (
+    <p className="px-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-dim">
+      {children}
+    </p>
+  );
+}
+
 export default function Sidebar({ user, onLogout, onOpenProfile, mobile = false }) {
   return (
     <aside
-      className={`w-56 shrink-0 border-r border-border bg-slate-950 px-3 py-5 ${
+      className={`w-56 shrink-0 border-r border-border bg-[#060b16] px-3 py-5 ${
         mobile ? "flex w-full flex-col" : "hidden lg:flex lg:flex-col"
       }`}
     >
-      <div className="mb-7 flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-panel border border-primary/30 bg-primary/10 font-display text-base tracking-widest text-primary">
+      <div className="mb-6 flex items-center gap-3 px-1">
+        <div className="flex h-10 w-10 items-center justify-center rounded-panel border border-primary/20 bg-primary/8 font-display text-sm tracking-[0.18em] text-primary">
           AS
         </div>
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.22em] text-muted">AI StockAnalysis</p>
-          <h1 className="font-display text-[1.75rem] leading-none text-text">Terminal</h1>
+        <div className="min-w-0">
+          <p className="text-[10px] uppercase tracking-[0.28em] text-muted">AI StockAnalysis</p>
+          <h1 className="font-display text-[1.2rem] leading-none text-text">Terminal</h1>
         </div>
       </div>
 
-      <div className="panel relative mb-7 bg-white/5 p-4">
-        <p className="text-[11px] uppercase tracking-[0.22em] text-muted">Investor</p>
+      <div className="panel relative mb-6 overflow-hidden border-white/5 bg-white/[0.03] p-4">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+        <p className="text-[10px] uppercase tracking-[0.24em] text-muted">Investor</p>
         <div className="mt-3 flex items-center gap-3">
           {user?.profile_pic ? (
             <img
@@ -53,32 +62,34 @@ export default function Sidebar({ user, onLogout, onOpenProfile, mobile = false 
             </div>
           )}
           <div className="min-w-0">
-            <p className="truncate text-[1.05rem] font-semibold leading-6 text-text">
+            <p className="truncate text-[0.98rem] font-semibold leading-5 text-text">
               {user?.first_name ? `${user.first_name} ${user.last_name || ""}` : "Guest Investor"}
             </p>
-            <p className="truncate text-[12px] text-muted">{user?.email || "Sign in to sync"}</p>
+            <p className="truncate text-[11px] text-muted">{user?.email || "Sign in to sync"}</p>
           </div>
         </div>
         <button
           type="button"
           onClick={onOpenProfile}
-          className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-panel border border-border bg-base text-muted transition hover:border-primary/30 hover:text-text"
+          className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-panel border border-white/10 bg-base/80 text-muted transition hover:border-primary/30 hover:text-text"
           aria-label="Edit profile"
         >
           <PencilLine size={15} />
         </button>
       </div>
 
-      <nav className="space-y-2" aria-label="Sidebar navigation">
+      <nav className="space-y-5" aria-label="Sidebar navigation">
+        <div className="space-y-2">
+          <SectionLabel>Workspace</SectionLabel>
         {navItems.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={label}
             to={to}
             className={({ isActive }) =>
-              `group relative flex items-center gap-3 rounded-panel px-4 py-3 text-[0.98rem] font-semibold transition ${
+              `group relative flex items-center gap-3 rounded-panel px-4 py-3 text-[0.95rem] font-semibold transition ${
                 isActive
-                  ? "bg-primary/12 text-text shadow-cyan"
-                  : "text-muted hover:bg-white/5 hover:text-text"
+                  ? "border border-primary/20 bg-primary/10 text-text shadow-cyan"
+                  : "border border-transparent text-muted hover:border-white/5 hover:bg-white/[0.03] hover:text-text"
               }`
             }
           >
@@ -87,48 +98,51 @@ export default function Sidebar({ user, onLogout, onOpenProfile, mobile = false 
                 {isActive ? (
                   <span className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-primary" />
                 ) : null}
-                <Icon size={17} className={isActive ? "text-primary" : ""} />
+                <Icon size={16} className={isActive ? "text-primary" : ""} />
                 <span>{label}</span>
               </>
             )}
           </NavLink>
         ))}
+        </div>
 
-        {featureItems.map(({ label, hint, icon: Icon, locked }) => (
-          <div
-            key={label}
-            className="group relative flex items-center justify-between rounded-panel border border-border bg-white/5 px-4 py-3 text-[0.96rem] text-muted"
+        <div className="space-y-2">
+          <SectionLabel>Tools</SectionLabel>
+          {featureItems.map(({ label, hint, icon: Icon, locked }) => (
+            <div
+              key={label}
+              className="group relative flex items-center justify-between rounded-panel border border-white/5 bg-white/[0.03] px-4 py-3 text-[0.93rem] text-muted transition hover:border-primary/15 hover:bg-white/[0.04]"
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <Icon size={16} />
+                <span className="truncate font-semibold">{label}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="rounded-chip bg-white/10 px-2 py-1 text-[9px] uppercase tracking-[0.18em] text-primary">
+                  {hint}
+                </span>
+                {locked ? <Lock size={11} className="text-muted" /> : null}
+              </div>
+            </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={onOpenProfile}
+            className="flex w-full items-center gap-3 rounded-panel border border-transparent px-4 py-3 text-[0.95rem] font-semibold text-muted transition hover:border-white/5 hover:bg-white/[0.03] hover:text-text"
           >
-            <div className="flex items-center gap-3">
-              <Icon size={17} />
-              <span className="font-semibold">{label}</span>
-            </div>
-            <span className="rounded-chip bg-white/10 px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-primary">
-              {hint}
-            </span>
-            {locked ? <Lock size={12} className="absolute right-3 top-3 text-muted" /> : null}
-            <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-panel">
-              <div className="skeleton absolute inset-y-0 -left-full w-1/2 opacity-20" />
-            </div>
-          </div>
-        ))}
-
-        <button
-          type="button"
-          onClick={onOpenProfile}
-          className="flex w-full items-center gap-3 rounded-panel px-4 py-3 text-[0.98rem] font-semibold text-muted transition hover:bg-white/5 hover:text-text"
-        >
-          <Settings2 size={17} />
-          <span>Profile Settings</span>
-        </button>
+            <Settings2 size={16} />
+            <span>Profile Settings</span>
+          </button>
+        </div>
       </nav>
 
       <button
         type="button"
         onClick={onLogout}
-        className="mt-auto flex items-center gap-3 rounded-panel border border-border px-4 py-3 text-[0.98rem] font-semibold text-muted transition hover:border-primary/30 hover:text-text"
+        className="mt-auto flex items-center gap-3 rounded-panel border border-white/8 bg-white/[0.02] px-4 py-3 text-[0.95rem] font-semibold text-muted transition hover:border-primary/20 hover:bg-white/[0.04] hover:text-text"
       >
-        <LogOut size={17} />
+        <LogOut size={16} />
         <span>Logout</span>
       </button>
     </aside>
