@@ -1,5 +1,7 @@
+import warnings
 from django.test import TestCase
 from django.utils import timezone
+from jwt import InsecureKeyLengthWarning
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -104,6 +106,26 @@ class LogoutAPITests(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class JWTSigningKeyTests(TestCase):
+    def test_refresh_token_generation_does_not_emit_insecure_key_warning(self):
+        user = CustomUser.objects.create_user(
+            username="jwttest",
+            email="jwttest@example.com",
+            phone_number="+911234567895",
+            password="StrongPassword123!",
+            is_active=True,
+        )
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            RefreshToken.for_user(user)
+
+        insecure_warnings = [
+            warning for warning in caught if issubclass(warning.category, InsecureKeyLengthWarning)
+        ]
+        self.assertEqual(insecure_warnings, [])
 
 
 class ResendRegistrationOTPAPITests(TestCase):

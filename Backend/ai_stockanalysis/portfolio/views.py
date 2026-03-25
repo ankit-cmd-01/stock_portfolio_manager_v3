@@ -47,7 +47,7 @@ class PortfolioListCreateView(APIView):
                 stock_master_qs = StockMaster.objects.filter(id__in=stock_ids).order_by("stock_name", "ticker")
                 for stock in stock_master_qs:
                     if UserStock.objects.filter(user=request.user, portfolio=portfolio, stock=stock).exists():
-                        skipped.append(stock.ticker)
+                        skipped.append(stock.yahoo_ticker or stock.ticker)
                         continue
 
                     user_stock = UserStock.objects.create(
@@ -171,6 +171,9 @@ class PortfolioForecastView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
+        import threading
+        from .services import forecast_service
+
         portfolio = get_user_portfolio(pk, request.user)
         if portfolio is None:
             return Response(
@@ -178,8 +181,37 @@ class PortfolioForecastView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        # Check for missing/outdated models and trigger background retraining if needed
+        user_stocks = forecast_service.UserStock.objects.filter(portfolio_id=portfolio.id)
+        stocks_to_retrain = []
+        for user_stock in user_stocks:
+            try:
+                artifact = forecast_service._load_model_artifact(user_stock)
+                # Check if model is outdated: compare latest_training_timestamp to latest data timestamp
+                latest_data = forecast_service.UserStockData.objects.filter(user_stock=user_stock).order_by('-timestamp').first()
+                if latest_data and artifact.get('latest_training_timestamp'):
+                    import dateutil.parser
+                    model_time = dateutil.parser.isoparse(artifact['latest_training_timestamp'])
+                    data_time = latest_data.timestamp
+                    if data_time > model_time:
+                        stocks_to_retrain.append(user_stock)
+            except Exception:
+                stocks_to_retrain.append(user_stock)
+
+        if stocks_to_retrain:
+            import logging
+            logger = logging.getLogger(__name__)
+            def retrain_async(stocks):
+                try:
+                    logger.info(f"Triggering background retraining for {len(stocks)} user stocks in portfolio {portfolio.id}")
+                    result = forecast_service.train_all_stock_models(stocks)
+                    logger.info(f"Background retraining complete for portfolio {portfolio.id}: {result}")
+                except Exception as exc:
+                    logger.exception(f"Background retraining failed for portfolio {portfolio.id}: {exc}")
+            threading.Thread(target=retrain_async, args=(stocks_to_retrain,), daemon=True).start()
+
         try:
-            payload = predict_portfolio(portfolio.id)
+            payload = forecast_service.predict_portfolio(portfolio.id)
         except RuntimeError as exc:
             return Response(
                 {"error": str(exc)},

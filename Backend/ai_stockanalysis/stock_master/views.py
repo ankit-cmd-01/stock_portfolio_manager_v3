@@ -141,7 +141,7 @@ class SuggestedPortfolioCategoryView(APIView):
                 {
                     "id": stock.id,
                     "stock_name": stock.stock_name,
-                    "ticker": stock.ticker,
+                    "ticker": stock.yahoo_ticker or stock.ticker,
                     "market": stock.market,
                     "exchange": stock.exchange,
                     "market_cap": stock.market_cap,

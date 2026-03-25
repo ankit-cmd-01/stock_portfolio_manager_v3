@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, ChevronRight } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronRight, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -141,6 +141,14 @@ export default function StockDetail() {
               {changePct >= 0 ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
               {Math.abs(changePct).toFixed(2)}% from previous candle
             </p>
+            <Link
+              to={`/advanced/${encodeURIComponent(data.ticker)}`}
+              state={{ company: data.company_name, fromPortfolioId: data.portfolio }}
+              className="mt-4 inline-flex items-center gap-2 rounded-panel border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary transition hover:-translate-y-0.5 hover:shadow-cyan"
+            >
+              <Sparkles size={15} />
+              Open Advanced Features
+            </Link>
           </div>
         </div>
       </section>

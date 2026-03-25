@@ -1,5 +1,6 @@
 import { Camera, KeyRound, LockKeyhole, Mail, Phone, UserRound } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Drawer from "./Drawer";
 import { resolveBackendUrl } from "../config/runtime";
@@ -20,7 +21,8 @@ const emptyPasswordForm = {
 };
 
 export default function ProfileSettingsDrawer({ open, onClose, onToast }) {
-  const { user, updateProfile, sendPasswordResetOtp, changePassword } = useAuth();
+  const navigate = useNavigate();
+  const { user, updateProfile, sendPasswordResetOtp, changePassword, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
   const [profileForm, setProfileForm] = useState({ first_name: "", last_name: "" });
   const [profileFile, setProfileFile] = useState(null);
@@ -96,6 +98,13 @@ export default function ProfileSettingsDrawer({ open, onClose, onToast }) {
       .join(" ") ||
     error.message ||
     "Something went wrong.";
+
+  const handleLogout = async () => {
+    await logout();
+    onClose?.();
+    onToast({ type: "success", message: "Logged out successfully." });
+    navigate("/login");
+  };
 
   const handleProfileSubmit = async (event) => {
     event.preventDefault();
@@ -267,6 +276,22 @@ export default function ProfileSettingsDrawer({ open, onClose, onToast }) {
             >
               {profileSaving ? "Saving..." : "Save Profile Changes"}
             </button>
+
+            <div className="rounded-panel border border-white/5 bg-white/[0.03] p-4">
+              <p className="text-xs uppercase tracking-widest text-muted">Session</p>
+              <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-muted">
+                  Sign out directly from your profile when you want to leave this terminal session.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="rounded-panel border border-loss/20 bg-loss/10 px-4 py-3 text-sm font-semibold text-loss transition hover:border-loss/40"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
           </form>
         ) : (
           <form className="space-y-5" onSubmit={handlePasswordSubmit}>

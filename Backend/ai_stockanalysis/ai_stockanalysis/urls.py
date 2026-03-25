@@ -15,6 +15,7 @@ def root_view(request):
             "stock_master_base_url": "/stock_master/",
             "user_stocks_base_url": "/user_stocks/",
             "metals_base_url": "/api/metals/",
+            "advanced_base_url": "/api/advanced/",
         }
     )
 
@@ -33,6 +34,7 @@ urlpatterns = [
     path("stock_master/", include("stock_master.urls")),
     path("user_stocks/", include("user_stock.urls")),
     path("api/metals/", include("metals.urls")),
+    path("api/advanced/", include("advanced.urls")),
 ]
 
 if settings.DEBUG:

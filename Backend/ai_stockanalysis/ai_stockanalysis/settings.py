@@ -1,3 +1,4 @@
+import hashlib
 import importlib.util
 import os
 from datetime import timedelta
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     "stock_master",
     "user_stock",
     "metals",
+    "advanced",
 ]
 
 if importlib.util.find_spec("django_apscheduler") is not None:
@@ -128,6 +130,24 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 TELEGRAM_API_ID = int(os.getenv("TELEGRAM_API_ID", "0"))
 TELEGRAM_API_HASH = os.getenv("TELEGRAM_API_HASH")
 TELEGRAM_PHONE = os.getenv("TELEGRAM_PHONE")
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
+DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
+DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+GROQ_BASE_URL = os.getenv("GROQ_BASE_URL", "https://api.groq.com/openai/v1")
+
+
+def build_jwt_signing_key(secret_key: str | None) -> str:
+    explicit_signing_key = os.getenv("JWT_SIGNING_KEY")
+    if explicit_signing_key:
+        return explicit_signing_key
+
+    base_key = secret_key or ""
+    if len(base_key.encode("utf-8")) >= 32:
+        return base_key
+
+    return hashlib.sha256(base_key.encode("utf-8")).hexdigest()
 
 
 REST_FRAMEWORK = {
@@ -143,4 +163,5 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
+    "SIGNING_KEY": build_jwt_signing_key(SECRET_KEY),
 }

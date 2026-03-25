@@ -8,7 +8,11 @@ from django.utils import timezone
 from portfolio.models import Portfolio
 from stock_master.models import StockMaster
 from user_stock.models import UserStock, UserStockData
-from user_stock.services import sync_user_stock_history_if_stale
+from user_stock.services import (
+    _fetch_market_metadata,
+    build_ticker_candidates,
+    sync_user_stock_history_if_stale,
+)
 
 
 class UserStockSyncTests(TestCase):
@@ -93,3 +97,30 @@ class UserStockSyncTests(TestCase):
 
         self.assertEqual(inserted, 0)
         incremental_sync.assert_not_called()
+
+    def test_build_ticker_candidates_prefers_exact_exchange_symbol_over_suspicious_saved_symbol(self):
+        self.stock.ticker = "M&M"
+        self.stock.yahoo_ticker = "M&M-BL.NS"
+        self.stock.exchange = "NSE"
+        self.stock.save(update_fields=["ticker", "yahoo_ticker", "exchange"])
+
+        with mock.patch("user_stock.services.resolve_yahoo_symbol", return_value="M&M-BL.NS"):
+            candidates = build_ticker_candidates(self.user_stock)
+
+        self.assertIn("M&M.NS", candidates)
+        self.assertLess(candidates.index("M&M.NS"), candidates.index("M&M-BL.NS"))
+
+    def test_fetch_market_metadata_uses_fast_info_without_hitting_info_endpoint(self):
+        class FakeTicker:
+            fast_info = {"market_cap": 123456789}
+
+            @property
+            def info(self):  # pragma: no cover - should never be accessed
+                raise AssertionError("Ticker.info should not be accessed")
+
+        with mock.patch("user_stock.services.yf.Ticker", return_value=FakeTicker()):
+            trailing_eps = _fetch_market_metadata("TEST.NS", self.user_stock)
+
+        self.assertIsNone(trailing_eps)
+        self.stock.refresh_from_db()
+        self.assertEqual(str(self.stock.market_cap), "123456789.00")

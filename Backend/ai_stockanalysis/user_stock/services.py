@@ -6,31 +6,65 @@ from django.utils import timezone
 
 from .models import UserStock, UserStockData
 from stock_master.models import StockMaster
-from stock_master.yahoo import configure_yfinance_cache, resolve_yahoo_symbol
+from stock_master.yahoo import configure_yfinance_cache, resolve_yahoo_symbol, symbol_match_score
+
+
+def _exchange_candidate(ticker: str, exchange: str) -> str | None:
+    base_ticker = (ticker or "").strip()
+    exchange = (exchange or "").strip().upper()
+    if not base_ticker:
+        return None
+    if "." in base_ticker:
+        return base_ticker
+    if exchange == "NSE":
+        return f"{base_ticker}.NS"
+    if exchange == "BSE":
+        return f"{base_ticker}.BO"
+    return base_ticker
+
+
+def _ordered_candidates(*candidate_groups: list[str]) -> list[str]:
+    seen = set()
+    ordered = []
+    for group in candidate_groups:
+        for candidate in group:
+            cleaned = (candidate or "").strip()
+            if not cleaned or cleaned in seen:
+                continue
+            seen.add(cleaned)
+            ordered.append(cleaned)
+    return ordered
 
 
 def build_ticker_candidates(user_stock: UserStock) -> list[str]:
-    primary_ticker = (user_stock.stock.yahoo_ticker or user_stock.stock.ticker).strip()
+    stock_ticker = (user_stock.stock.ticker or "").strip()
+    primary_ticker = (user_stock.stock.yahoo_ticker or stock_ticker).strip()
     exchange = (user_stock.stock.exchange or "").strip().upper()
-    candidates = []
     resolved = resolve_yahoo_symbol(
         stock_name=user_stock.stock.stock_name,
-        ticker=user_stock.stock.ticker,
+        ticker=stock_ticker,
         exchange=exchange,
     )
+    exact_exchange_candidate = _exchange_candidate(stock_ticker, exchange)
 
-    if resolved:
-        candidates.append(resolved)
+    preferred = []
+    fallback = []
 
-    if primary_ticker:
-        candidates.append(primary_ticker)
+    if resolved and symbol_match_score(resolved, stock_ticker) == 3:
+        preferred.append(resolved)
+    if primary_ticker and symbol_match_score(primary_ticker, stock_ticker) == 3:
+        preferred.append(primary_ticker)
+    if exact_exchange_candidate:
+        preferred.append(exact_exchange_candidate)
+    if stock_ticker:
+        preferred.append(stock_ticker)
 
-    if primary_ticker and "." not in primary_ticker and exchange == "NSE":
-        candidates.append(f"{primary_ticker}.NS")
-    elif primary_ticker and "." not in primary_ticker and exchange == "BSE":
-        candidates.append(f"{primary_ticker}.BO")
+    if resolved and symbol_match_score(resolved, stock_ticker) < 3:
+        fallback.append(resolved)
+    if primary_ticker and symbol_match_score(primary_ticker, stock_ticker) < 3:
+        fallback.append(primary_ticker)
 
-    return list(dict.fromkeys(filter(None, candidates)))
+    return _ordered_candidates(preferred, fallback)
 
 
 def normalize_history_columns(df):
@@ -40,17 +74,39 @@ def normalize_history_columns(df):
     return df
 
 
+def _fast_info_value(fast_info, key: str):
+    if fast_info is None:
+        return None
+    try:
+        value = fast_info.get(key)
+    except Exception:
+        value = None
+    if value is not None:
+        return value
+    try:
+        return fast_info[key]
+    except Exception:
+        return None
+
+
 def _fetch_market_metadata(candidate: str, user_stock: UserStock) -> float | None:
     stock_ticker = yf.Ticker(candidate)
-    info = stock_ticker.info or {}
-    candidate_eps = info.get("trailingEps")
-    trailing_eps = float(candidate_eps) if candidate_eps else None
-    market_cap = info.get("marketCap")
+    market_cap = None
+
+    try:
+        fast_info = stock_ticker.fast_info
+        if fast_info is not None:
+            market_cap = _fast_info_value(fast_info, "market_cap")
+            if market_cap is None:
+                market_cap = _fast_info_value(fast_info, "marketCap")
+    except Exception:
+        market_cap = None
+
     if market_cap is not None:
         StockMaster.objects.filter(pk=user_stock.stock_id).update(
             market_cap=Decimal(str(market_cap))
         )
-    return trailing_eps
+    return None
 
 
 def _persist_yahoo_ticker(user_stock: UserStock, candidate: str) -> None:
@@ -64,6 +120,7 @@ def _download_history(candidate: str, *, period: str | None = None, start=None, 
         "interval": "1h",
         "auto_adjust": True,
         "progress": False,
+        "threads": False,
     }
     if period is not None:
         download_kwargs["period"] = period
@@ -137,7 +194,7 @@ def _incremental_period_for_gap(gap: timedelta) -> str:
 
 
 def fetch_and_save_historical_stock_data(user_stock: UserStock) -> int:
-    ticker = user_stock.stock.ticker
+    ticker = user_stock.stock.yahoo_ticker or user_stock.stock.ticker
     resolved_symbol = ticker
     last_error = None
 
@@ -173,7 +230,7 @@ def fetch_and_save_incremental_stock_data(
     *,
     latest_timestamp,
 ) -> int:
-    ticker = user_stock.stock.ticker
+    ticker = user_stock.stock.yahoo_ticker or user_stock.stock.ticker
     resolved_symbol = ticker
     last_error = None
     now = timezone.now()

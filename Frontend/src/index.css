@@ -43,6 +43,7 @@
 
   body {
     @apply m-0 bg-base font-body text-text antialiased;
+    overflow-x: hidden;
     background-image:
       radial-gradient(circle at top left, rgba(0, 212, 255, 0.12), transparent 24%),
       radial-gradient(circle at 82% 12%, rgba(0, 230, 118, 0.08), transparent 18%),
@@ -63,12 +64,13 @@
 
   #root {
     min-height: 100vh;
+    overflow-x: hidden;
   }
 }
 
 @layer components {
   .app-shell {
-    @apply min-h-screen;
+    @apply min-h-screen overflow-x-hidden;
   }
 
   .panel {

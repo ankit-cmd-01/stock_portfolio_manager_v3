@@ -30,7 +30,8 @@ class UserStock(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.user.username} | {self.stock.ticker} | {self.portfolio.title}"
+        symbol = self.stock.yahoo_ticker or self.stock.ticker
+        return f"{self.user.username} | {symbol} | {self.portfolio.title}"
 
 
 class UserStockData(models.Model):
@@ -57,4 +58,5 @@ class UserStockData(models.Model):
         ordering = ["timestamp"]
 
     def __str__(self):
-        return f"{self.user_stock.stock.ticker} @ {self.timestamp}"
+        symbol = self.user_stock.stock.yahoo_ticker or self.user_stock.stock.ticker
+        return f"{symbol} @ {self.timestamp}"

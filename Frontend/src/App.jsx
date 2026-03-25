@@ -18,6 +18,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { MetalsProvider } from "./context/MetalsContext";
 import { useAuth } from "./hooks/useAuth";
 import AuthPage from "./pages/AuthPage";
+import AdvancedFeatures from "./pages/AdvancedFeatures/AdvancedFeatures";
 import Dashboard from "./pages/Dashboard";
 import Landing from "./pages/Landing";
 import MetalDetailPage from "./pages/MetalDetailPage";
@@ -113,6 +114,7 @@ function AppRoutes({ onToast }) {
           <Route path="/metals/:metal" element={<MetalDetailPage />} />
           <Route path="/portfolio/:id" element={<PortfolioView />} />
           <Route path="/stock/:pk" element={<StockDetail />} />
+          <Route path="/advanced/:ticker" element={<AdvancedFeatures />} />
         </Route>
       </Route>
 

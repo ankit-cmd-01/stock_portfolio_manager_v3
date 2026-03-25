@@ -1,10 +1,12 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 
 import { metalsApi } from "../api/metalsApi";
+import { useAuth } from "../hooks/useAuth";
 
 export const MetalsContext = createContext(null);
 
 export function MetalsProvider({ children }) {
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [selectedMetal, setSelectedMetal] = useState("overview");
   const [health, setHealth] = useState(null);
   const [goldSummary, setGoldSummary] = useState(null);
@@ -13,6 +15,9 @@ export function MetalsProvider({ children }) {
   const [error, setError] = useState("");
 
   const loadHealth = useCallback(async () => {
+    if (!isAuthenticated) {
+      return;
+    }
     try {
       const response = await metalsApi.health();
       setHealth(response.data);
@@ -20,9 +25,12 @@ export function MetalsProvider({ children }) {
     } catch (requestError) {
       setError(requestError.response?.data?.error || "Unable to load metals health.");
     }
-  }, []);
+  }, [isAuthenticated]);
 
   const loadSummaries = useCallback(async () => {
+    if (!isAuthenticated) {
+      return;
+    }
     try {
       const [goldResponse, silverResponse] = await Promise.all([
         metalsApi.summary("gold"),
@@ -33,9 +41,12 @@ export function MetalsProvider({ children }) {
     } catch (requestError) {
       setError(requestError.response?.data?.error || "Unable to load metals summaries.");
     }
-  }, []);
+  }, [isAuthenticated]);
 
   const triggerSync = useCallback(async () => {
+    if (!isAuthenticated) {
+      return null;
+    }
     setSyncLoading(true);
     try {
       const response = await metalsApi.sync();
@@ -44,13 +55,29 @@ export function MetalsProvider({ children }) {
     } finally {
       setSyncLoading(false);
     }
-  }, [loadHealth, loadSummaries]);
+  }, [isAuthenticated, loadHealth, loadSummaries]);
 
   const refreshMetals = useCallback(async () => {
+    if (!isAuthenticated) {
+      return;
+    }
     await Promise.all([loadHealth(), loadSummaries()]);
-  }, [loadHealth, loadSummaries]);
+  }, [isAuthenticated, loadHealth, loadSummaries]);
 
   useEffect(() => {
+    if (authLoading) {
+      return undefined;
+    }
+
+    if (!isAuthenticated) {
+      setHealth(null);
+      setGoldSummary(null);
+      setSilverSummary(null);
+      setError("");
+      setSyncLoading(false);
+      return undefined;
+    }
+
     loadHealth();
     loadSummaries();
 
@@ -59,7 +86,7 @@ export function MetalsProvider({ children }) {
     }, 60000);
 
     return () => window.clearInterval(intervalId);
-  }, []);
+  }, [authLoading, isAuthenticated, loadHealth, loadSummaries]);
 
   const value = useMemo(
     () => ({

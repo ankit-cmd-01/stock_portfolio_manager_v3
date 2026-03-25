@@ -37,6 +37,35 @@ def normalize_text(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", " ", (value or "").lower()).strip()
 
 
+def normalize_symbol_code(value: str) -> str:
+    symbol = (value or "").strip().upper()
+    if "." in symbol:
+        symbol = symbol.rsplit(".", 1)[0]
+    return re.sub(r"[^A-Z0-9]+", "", symbol)
+
+
+def symbol_match_score(symbol: str, ticker: str) -> int:
+    normalized_symbol = normalize_symbol_code(symbol)
+    normalized_ticker = normalize_symbol_code(ticker)
+
+    if not normalized_symbol or not normalized_ticker:
+        return 0
+    if normalized_symbol == normalized_ticker:
+        return 3
+    if normalized_symbol.startswith(normalized_ticker) or normalized_ticker.startswith(normalized_symbol):
+        return 2
+    if normalized_ticker in normalized_symbol:
+        return 1
+    return 0
+
+
+def symbol_has_extra_qualifier(symbol: str) -> bool:
+    base_symbol = (symbol or "").strip().upper()
+    if "." in base_symbol:
+        base_symbol = base_symbol.rsplit(".", 1)[0]
+    return "-" in base_symbol
+
+
 def significant_tokens(value: str) -> list[str]:
     tokens = [token for token in normalize_text(value).split() if token and token not in _STOPWORDS]
     return tokens
@@ -48,6 +77,7 @@ def quote_score(quote: dict, *, stock_name: str, ticker: str, exchange: str) -> 
     longname = normalize_text(quote.get("longname") or "")
     quote_type = normalize_text(quote.get("quoteType") or quote.get("typeDisp") or "")
     desired_suffix = EXCHANGE_SUFFIX_MAP.get(exchange.upper(), "")
+    match_quality = symbol_match_score(symbol, ticker)
 
     score = 0
 
@@ -56,8 +86,15 @@ def quote_score(quote: dict, *, stock_name: str, ticker: str, exchange: str) -> 
     elif desired_suffix and "." not in symbol:
         score -= 10
 
-    if ticker and ticker.lower() in symbol.lower():
-        score += 20
+    if match_quality == 3:
+        score += 60
+    elif match_quality == 2:
+        score += 12
+    elif match_quality == 1:
+        score += 4
+
+    if symbol_has_extra_qualifier(symbol) and match_quality < 3:
+        score -= 20
 
     tokens = significant_tokens(stock_name)
     if tokens:
