@@ -64,6 +64,22 @@ export default function ChatWidget() {
     });
   }, [messages, open, sending]);
 
+  const openChat = () => {
+    setOpen(true);
+  };
+
+  const closeChat = () => {
+    setOpen(false);
+  };
+
+  const handleOpenPointerDown = (event) => {
+    if (event.button !== 0) {
+      return;
+    }
+
+    setOpen(true);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -123,7 +139,7 @@ export default function ChatWidget() {
   };
 
   return (
-    <div className="pointer-events-none fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
+    <div className="pointer-events-none fixed bottom-5 right-5 z-[60] flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
       {open ? (
         <section className="pointer-events-auto w-[min(92vw,22rem)] overflow-hidden rounded-modal border border-border bg-elevated shadow-panel">
           <header className="flex items-center justify-between border-b border-border px-4 py-3">
@@ -140,8 +156,8 @@ export default function ChatWidget() {
             </div>
             <button
               type="button"
-              onClick={() => setOpen(false)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-panel border border-border bg-base text-muted transition hover:border-primary/30 hover:text-text"
+              onClick={closeChat}
+              className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-panel border border-border bg-base text-muted transition duration-150 hover:border-primary/30 hover:text-text active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
               aria-label="Close chat"
             >
               <X size={16} />
@@ -205,8 +221,9 @@ export default function ChatWidget() {
 
       <button
         type="button"
-        onClick={() => setOpen((current) => !current)}
-        className="pointer-events-auto inline-flex h-12 w-12 items-center justify-center rounded-full border border-primary/30 bg-primary text-slate-950 shadow-cyan transition hover:scale-[1.02] sm:h-[3.2rem] sm:w-[3.2rem]"
+        onPointerDown={handleOpenPointerDown}
+        onClick={openChat}
+        className="pointer-events-auto inline-flex h-12 w-12 cursor-pointer touch-manipulation items-center justify-center rounded-full border border-primary/30 bg-primary text-slate-950 shadow-cyan transition duration-150 hover:-translate-y-0.5 hover:scale-[1.06] hover:border-primary/60 hover:shadow-[0_0_30px_rgba(34,211,238,0.45)] active:scale-95 active:shadow-[0_0_20px_rgba(34,211,238,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 sm:h-[3.2rem] sm:w-[3.2rem]"
         aria-label="Open chatbot"
       >
         <MessageSquare size={18} />

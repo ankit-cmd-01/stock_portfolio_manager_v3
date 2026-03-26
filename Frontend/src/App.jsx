@@ -142,8 +142,8 @@ function AppInner() {
         <MetalsProvider>
           <div className="desktop-density">
             <AppRoutes onToast={setToast} />
-            <ChatWidget />
           </div>
+          <ChatWidget />
         </MetalsProvider>
       </BrowserRouter>
       <ToastViewport toast={toast} onClose={() => setToast(null)} />
