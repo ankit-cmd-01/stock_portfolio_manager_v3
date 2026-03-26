@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 
 from .models import Portfolio
 from .serializers import PortfolioCreateSerializer, PortfolioSerializer
+from .services.ai_summary_service import generate_portfolio_ai_summary
 from .services.forecast_service import predict_portfolio
 from stock_master.models import StockMaster
 from user_stock.models import UserStock
@@ -221,6 +222,33 @@ class PortfolioForecastView(APIView):
             return Response(
                 {"error": str(exc)},
                 status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(payload, status=status.HTTP_200_OK)
+
+
+class PortfolioAISummaryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        portfolio = get_user_portfolio(pk, request.user)
+        if portfolio is None:
+            return Response(
+                {"error": "Portfolio not found or access denied"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        try:
+            payload = generate_portfolio_ai_summary(portfolio.id)
+        except ValueError as exc:
+            return Response(
+                {"error": str(exc)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except RuntimeError as exc:
+            return Response(
+                {"error": str(exc)},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
 
         return Response(payload, status=status.HTTP_200_OK)

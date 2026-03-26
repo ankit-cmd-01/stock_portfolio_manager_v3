@@ -1,22 +1,21 @@
-import { ChevronLeft, ChevronRight, LineChart, Plus, RefreshCw, Search, TrendingDown, TrendingUp } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useAppToast } from "../App";
 import {
   createUserStock,
-  getPortfolioForecast,
   getUserStock,
   removeUserStock,
   searchStockMaster,
 } from "../api/stocks";
 import Drawer from "../components/Drawer";
 import EmptyState from "../components/EmptyState";
+import PortfolioInsightsPanel from "../components/PortfolioInsightsPanel";
 import SkeletonBlock from "../components/SkeletonBlock";
 import StockCard from "../components/StockCard";
 import { usePortfolio } from "../hooks/usePortfolio";
 import { formatRelativeMinutes } from "../utils/formatDate";
-import { formatPrice } from "../utils/formatPrice";
 
 const EMPTY_ARRAY = [];
 
@@ -36,9 +35,6 @@ export default function PortfolioView() {
   const [deletingId, setDeletingId] = useState(null);
   const [stockPage, setStockPage] = useState(0);
   const [stockSearch, setStockSearch] = useState("");
-  const [forecastData, setForecastData] = useState(null);
-  const [forecastLoading, setForecastLoading] = useState(true);
-  const [forecastError, setForecastError] = useState("");
   const pageSize = 3;
 
   const selectedPortfolio = portfolios.find((portfolio) => String(portfolio.id) === String(id));
@@ -157,85 +153,6 @@ export default function PortfolioView() {
     const timestamps = stocks.map((item) => item.modified_at).filter(Boolean);
     return timestamps.sort().reverse()[0];
   }, [stocks]);
-  const forecastSignature = useMemo(
-    () =>
-      stocks
-        .map((stock) => `${stock.id}:${stock.quantity}:${stock.modified_at}`)
-        .join("|"),
-    [stocks]
-  );
-  const forecastRows = useMemo(
-    () =>
-      [...(forecastData?.stock_predictions ?? [])]
-        .sort((a, b) => Math.abs(Number(b.growth_pct ?? 0)) - Math.abs(Number(a.growth_pct ?? 0)))
-        .slice(0, 4),
-    [forecastData]
-  );
-  const readyModelCount = useMemo(
-    () =>
-      (forecastData?.stock_predictions ?? []).filter((item) => item.model_status === "ready").length,
-    [forecastData]
-  );
-
-  useEffect(() => {
-    let ignore = false;
-
-    const loadForecast = async () => {
-      if (!id) {
-        return;
-      }
-
-      setForecastLoading(true);
-      setForecastError("");
-
-      try {
-        const response = await getPortfolioForecast(id);
-        if (!ignore) {
-          setForecastData(response);
-        }
-      } catch (forecastRequestError) {
-        if (!ignore) {
-          setForecastData(null);
-          setForecastError(
-            forecastRequestError.response?.data?.error || "Unable to load portfolio forecast."
-          );
-        }
-      } finally {
-        if (!ignore) {
-          setForecastLoading(false);
-        }
-      }
-    };
-
-    loadForecast();
-
-    return () => {
-      ignore = true;
-    };
-  }, [forecastSignature, id]);
-
-  const handleRefreshForecast = async () => {
-    setForecastLoading(true);
-    setForecastError("");
-
-    try {
-      const response = await getPortfolioForecast(id);
-      setForecastData(response);
-      onToast({ type: "success", message: "Portfolio forecast refreshed." });
-    } catch (forecastRequestError) {
-      setForecastData(null);
-      setForecastError(
-        forecastRequestError.response?.data?.error || "Unable to refresh portfolio forecast."
-      );
-      onToast({
-        type: "error",
-        message:
-          forecastRequestError.response?.data?.error || "Unable to refresh portfolio forecast.",
-      });
-    } finally {
-      setForecastLoading(false);
-    }
-  };
 
   const handleAddStock = async () => {
     if (!selectedTicker) {
@@ -381,6 +298,13 @@ export default function PortfolioView() {
         </div>
 
         <div className="space-y-5">
+          <PortfolioInsightsPanel
+            portfolioId={id}
+            stocks={stocks}
+            cachedDetailsMap={detailsMap}
+            onToast={onToast}
+          />
+          {false ? (
           <section className="panel p-5">
             <div className="mb-4 flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -498,6 +422,7 @@ export default function PortfolioView() {
               </div>
             )}
           </section>
+          ) : null}
         </div>
       </section>
 

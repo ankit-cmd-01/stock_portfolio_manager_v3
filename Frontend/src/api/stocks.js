@@ -49,6 +49,13 @@ export const getPortfolioForecast = async (pk) => {
   return data;
 };
 
+export const getPortfolioAiSummary = async (pk) => {
+  const { data } = await api.get(`/api/portfolio/${pk}/ai-summary/`, {
+    timeout: 45000,
+  });
+  return data;
+};
+
 export const getPortfolios = async () => {
   const { data } = await api.get("/portfolio/");
   return data;
