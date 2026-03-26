@@ -83,28 +83,34 @@ export default function PortfolioView() {
 
       setDetailsLoading(true);
       setTableLoading(true);
-      try {
-        const [detailResults, tableResponse] = await Promise.all([
-          Promise.all(
-            visibleStocks.map(async (stock) => {
-              const response = await getUserStock(stock.id);
-              return [stock.id, response.user_stock];
-            })
-          ),
-          getPortfolioTableRows(
-            id,
-            visibleStocks.map((stock) => stock.id)
-          ),
-        ]);
-        setDetailsMap((current) => ({ ...current, ...Object.fromEntries(detailResults) }));
-        setTableRows(tableResponse.rows ?? []);
-      } catch (detailError) {
+      const [detailResults, tableResult] = await Promise.allSettled([
+        Promise.all(
+          visibleStocks.map(async (stock) => {
+            const response = await getUserStock(stock.id);
+            return [stock.id, response.user_stock];
+          })
+        ),
+        getPortfolioTableRows(
+          id,
+          visibleStocks.map((stock) => stock.id)
+        ),
+      ]);
+
+      if (detailResults.status === "fulfilled") {
+        setDetailsMap((current) => ({ ...current, ...Object.fromEntries(detailResults.value) }));
+      } else {
+        onToast({ type: "error", message: "Detailed chart data could not be loaded for some stocks." });
+      }
+
+      if (tableResult.status === "fulfilled") {
+        setTableRows(tableResult.value.rows ?? []);
+      } else {
         setTableRows([]);
         onToast({ type: "error", message: "Unable to load portfolio analysis rows." });
-      } finally {
-        setDetailsLoading(false);
-        setTableLoading(false);
       }
+
+      setDetailsLoading(false);
+      setTableLoading(false);
     };
 
     loadVisibleData();
@@ -227,8 +233,8 @@ export default function PortfolioView() {
         </button>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-3">
-        <div className="space-y-5 xl:col-span-2">
+      <section className="space-y-6">
+        <div className="space-y-5">
           {loading || detailsLoading || tableLoading ? (
             <div className="space-y-3">
               {Array.from({ length: 4 }).map((_, index) => <SkeletonBlock key={index} className="h-14 w-full" />)}
@@ -245,18 +251,18 @@ export default function PortfolioView() {
             />
           ) : (
             <div className="space-y-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="relative min-w-[240px] flex-1">
-                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
-                <input
-                  type="text"
-                  value={stockSearch}
-                  onChange={(event) => setStockSearch(event.target.value)}
-                  placeholder="Search stocks in portfolio..."
-                  className="w-full rounded-panel border border-border bg-base px-11 py-2.5 text-sm text-text placeholder:text-muted focus:border-primary/40 focus:outline-none"
-                />
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="relative min-w-[240px] flex-1">
+                  <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
+                  <input
+                    type="text"
+                    value={stockSearch}
+                    onChange={(event) => setStockSearch(event.target.value)}
+                    placeholder="Search stocks in portfolio..."
+                    className="w-full rounded-panel border border-border bg-base px-11 py-2.5 text-sm text-text placeholder:text-muted focus:border-primary/40 focus:outline-none"
+                  />
+                </div>
               </div>
-            </div>
 
               <PortfolioStocksTable
                 rows={tableRows}

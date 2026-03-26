@@ -211,9 +211,9 @@
 @supports (zoom: 1) {
   @media (min-width: 1400px) {
     .desktop-density {
-      zoom: 0.84;
-      width: calc(100% / 0.84);
-      min-height: calc(100vh / 0.84);
+      zoom: 1;
+      width: 100%;
+      min-height: 100vh;
     }
   }
 }

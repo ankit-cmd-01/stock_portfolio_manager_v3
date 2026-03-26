@@ -29,9 +29,22 @@ export default function PortfolioStocksTable({
 }) {
   return (
     <section className="panel overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="min-w-[1200px] border-collapse">
-          <thead className="bg-white/5">
+      <div className="h-[31rem] overflow-y-auto overflow-x-hidden scrollbar-thin lg:h-[32rem]">
+        <table className="w-full table-fixed border-collapse">
+          <colgroup>
+            <col className="w-[18%]" />
+            <col className="w-[8%]" />
+            <col className="w-[8%]" />
+            <col className="w-[8%]" />
+            <col className="w-[9%]" />
+            <col className="w-[7%]" />
+            <col className="w-[7%]" />
+            <col className="w-[8%]" />
+            <col className="w-[8%]" />
+            <col className="w-[9%]" />
+            <col className="w-[10%]" />
+          </colgroup>
+          <thead className="sticky top-0 z-10 bg-elevated/95 backdrop-blur">
             <tr>
               {[
                 "Company",
@@ -46,7 +59,10 @@ export default function PortfolioStocksTable({
                 "Sentiment",
                 "Action",
               ].map((column) => (
-                <th key={column} className="px-4 py-4 text-left text-[11px] uppercase tracking-[0.18em] text-muted">
+                <th
+                  key={column}
+                  className="px-2 py-2 text-left text-[9px] uppercase tracking-[0.14em] text-muted lg:text-[10px]"
+                >
                   {column}
                 </th>
               ))}
@@ -62,54 +78,59 @@ export default function PortfolioStocksTable({
             ) : (
               rows.map((row) => (
                 <tr key={row.user_stock_id} className="border-t border-white/5 align-top">
-                  <td className="px-4 py-4">
-                    <div className="min-w-[180px]">
-                      <p className="font-display text-lg text-text">{row.company_name}</p>
-                      <p className="mt-1 text-xs uppercase tracking-widest text-primary">{row.ticker}</p>
+                  <td className="px-2 py-2.5">
+                    <div className="min-w-0">
+                      <p
+                        className="line-clamp-2 break-words font-display text-[15px] leading-tight lg:text-base"
+                        style={{ color: "#f8fbff" }}
+                      >
+                        {row.company_name}
+                      </p>
+                      <p className="mt-0.5 truncate text-[10px] uppercase tracking-[0.14em] text-primary">{row.ticker}</p>
                     </div>
                   </td>
-                  <td className="px-4 py-4 text-sm font-semibold text-text">{formatPrice(row.price)}</td>
-                  <td className="px-4 py-4 text-sm text-muted">{formatPrice(row.min_price)}</td>
-                  <td className="px-4 py-4 text-sm text-muted">{formatPrice(row.max_price)}</td>
-                  <td className="px-4 py-4 text-sm font-semibold text-text">{formatPrice(row.predicted_price)}</td>
+                  <td className="px-2 py-2.5 text-[13px] font-semibold text-text lg:text-sm">{formatPrice(row.price)}</td>
+                  <td className="px-2 py-2.5 text-[13px] text-muted lg:text-sm">{formatPrice(row.min_price)}</td>
+                  <td className="px-2 py-2.5 text-[13px] text-muted lg:text-sm">{formatPrice(row.max_price)}</td>
+                  <td className="px-2 py-2.5 text-[13px] font-semibold text-text lg:text-sm">{formatPrice(row.predicted_price)}</td>
                   <td
-                    className={`px-4 py-4 text-sm font-semibold ${
+                    className={`px-2 py-2.5 text-[13px] font-semibold lg:text-sm ${
                       Number(row.change_pct) >= 0 ? "text-profit" : "text-loss"
                     }`}
                   >
                     {formatPercent(row.change_pct, 2, true)}
                   </td>
-                  <td className="px-4 py-4">
-                    <span className={`rounded-chip border px-3 py-1 text-xs font-semibold uppercase tracking-widest ${pillTone(row.signal)}`}>
+                  <td className="px-2 py-2.5">
+                    <span className={`inline-flex min-w-[64px] justify-center rounded-chip border px-1.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${pillTone(row.signal)}`}>
                       {row.signal}
                     </span>
                   </td>
-                  <td className="px-4 py-4 text-sm text-text">{formatPercent(row.confidence_pct, 1)}</td>
-                  <td className="px-4 py-4 text-sm text-text">{formatPercent(row.discount_pct)}</td>
-                  <td className="px-4 py-4">
-                    <div className="min-w-[130px]">
-                      <span className={`rounded-chip border px-3 py-1 text-xs font-semibold uppercase tracking-widest ${pillTone(row.sentiment)}`}>
+                  <td className="px-2 py-2.5 text-[13px] text-text lg:text-sm">{formatPercent(row.confidence_pct, 1)}</td>
+                  <td className="px-2 py-2.5 text-[13px] text-text lg:text-sm">{formatPercent(row.discount_pct)}</td>
+                  <td className="px-2 py-2.5">
+                    <div className="min-w-0">
+                      <span className={`inline-flex rounded-chip border px-1.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${pillTone(row.sentiment)}`}>
                         {row.sentiment}
                       </span>
-                      <p className="mt-2 text-xs text-muted">{row.news_count} ET stories</p>
+                      <p className="mt-1 truncate text-[9px] leading-none text-muted">{row.news_count} ET stories</p>
                     </div>
                   </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
+                  <td className="px-2 py-2.5">
+                    <div className="flex items-center gap-1.5">
                       <Link
-                        to={`/advanced/${encodeURIComponent(row.ticker)}`}
-                        className="text-sm font-semibold text-primary transition hover:translate-x-1"
+                        to={`/stock/${row.user_stock_id}`}
+                        className="truncate text-[13px] font-semibold text-primary transition hover:translate-x-1 lg:text-sm"
                       >
-                        View Analysis
+                        Analysis
                       </Link>
                       <button
                         type="button"
                         onClick={() => onDelete(row.user_stock_id)}
                         disabled={deletingId === row.user_stock_id}
                         aria-label={`Delete ${row.ticker}`}
-                        className="rounded-chip border border-white/10 p-2 text-muted transition hover:border-loss/40 hover:text-loss disabled:opacity-60"
+                        className="rounded-chip border border-white/10 p-1.5 text-muted transition hover:border-loss/40 hover:text-loss disabled:opacity-60"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={13} />
                       </button>
                     </div>
                   </td>

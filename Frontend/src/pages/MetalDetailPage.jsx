@@ -6,14 +6,13 @@ import { Link, useParams } from "react-router-dom";
 import { metalsApi } from "../api/metalsApi";
 import CorrelationCell from "../components/metals/CorrelationCell";
 import MetricCard from "../components/metals/MetricCard";
+import MetalsStickyHeader from "../components/metals/MetalsStickyHeader";
 import SectionHeader from "../components/metals/SectionHeader";
 import StatusBadge from "../components/metals/StatusBadge";
-import SyncStatusBar from "../components/metals/SyncStatusBar";
 import ToggleChip from "../components/metals/ToggleChip";
 import "../components/metals/chartSetup";
 import { MetalsContext } from "../context/MetalsContext";
 import { useMetals } from "../hooks/useMetals";
-import { useSyncStatus } from "../hooks/useSyncStatus";
 import { formatChange, formatPrice, formatTimestamp, getBBPosition, getMACDSignal, getRSILabel } from "../utils/metalsHelpers";
 
 const ranges = [
@@ -35,7 +34,6 @@ export default function MetalDetailPage() {
   const { setSelectedMetal, triggerSync } = useContext(MetalsContext);
   const [range, setRange] = useState("1m");
   const { prices, ohlc, summary: metalSummary, eda, loading, error } = useMetals(metal, range);
-  const { nextSyncIn } = useSyncStatus(metal);
   const [overlays, setOverlays] = useState({
     sma20: true,
     sma50: true,
@@ -367,7 +365,7 @@ export default function MetalDetailPage() {
 
   return (
     <div className="space-y-6">
-      <SyncStatusBar metal={metal} />
+      <MetalsStickyHeader activeTab={metal} metal={metal} />
 
       <section className="grid gap-4 xl:grid-cols-6">
         <MetricCard
