@@ -4,6 +4,7 @@ from .views import (
     UserStockByPortfolioView,
     UserStockDetailView,
     UserStockListCreateView,
+    UserStockPortfolioTableView,
 )
 
 urlpatterns = [
@@ -21,5 +22,10 @@ urlpatterns = [
         "portfolio/<int:portfolio_pk>/",
         UserStockByPortfolioView.as_view(),
         name="user-stock-by-portfolio",
+    ),
+    path(
+        "portfolio/<int:portfolio_pk>/table/",
+        UserStockPortfolioTableView.as_view(),
+        name="user-stock-portfolio-table",
     ),
 ]

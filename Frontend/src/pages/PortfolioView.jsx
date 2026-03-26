@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -6,14 +6,15 @@ import { useAppToast } from "../App";
 import {
   createUserStock,
   getUserStock,
+  getPortfolioTableRows,
   removeUserStock,
   searchStockMaster,
 } from "../api/stocks";
 import Drawer from "../components/Drawer";
 import EmptyState from "../components/EmptyState";
 import PortfolioInsightsPanel from "../components/PortfolioInsightsPanel";
+import PortfolioStocksTable from "../components/PortfolioStocksTable";
 import SkeletonBlock from "../components/SkeletonBlock";
-import StockCard from "../components/StockCard";
 import { usePortfolio } from "../hooks/usePortfolio";
 import { formatRelativeMinutes } from "../utils/formatDate";
 
@@ -25,6 +26,8 @@ export default function PortfolioView() {
   const { portfolios, portfolioData, loading, error, reload } = usePortfolio(id);
   const [detailsMap, setDetailsMap] = useState({});
   const [detailsLoading, setDetailsLoading] = useState(true);
+  const [tableRows, setTableRows] = useState([]);
+  const [tableLoading, setTableLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedTicker, setSelectedTicker] = useState(null);
@@ -33,9 +36,7 @@ export default function PortfolioView() {
   const [searchError, setSearchError] = useState("");
   const [addingStock, setAddingStock] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
-  const [stockPage, setStockPage] = useState(0);
   const [stockSearch, setStockSearch] = useState("");
-  const pageSize = 3;
 
   const selectedPortfolio = portfolios.find((portfolio) => String(portfolio.id) === String(id));
   const stocks = portfolioData?.user_stocks ?? EMPTY_ARRAY;
@@ -53,62 +54,61 @@ export default function PortfolioView() {
       return haystack.includes(term);
     });
   }, [stockSearch, stocks]);
-  const filteredStockPages = Math.max(1, Math.ceil(filteredStocks.length / pageSize));
-  const currentStockPage = Math.min(stockPage, filteredStockPages - 1);
-  const pagedStocks = useMemo(
-    () => filteredStocks.slice(currentStockPage * pageSize, currentStockPage * pageSize + pageSize),
-    [currentStockPage, filteredStocks]
-  );
-  const pagedStockSignature = useMemo(
-    () => pagedStocks.map((stock) => stock.id).join("|"),
-    [pagedStocks]
+  const visibleStocks = filteredStocks;
+  const visibleStockSignature = useMemo(
+    () => visibleStocks.map((stock) => stock.id).join("|"),
+    [visibleStocks]
   );
   const lastLoadedSignatureRef = useRef("");
 
   useEffect(() => {
-    setStockPage(0);
+    lastLoadedSignatureRef.current = "";
   }, [id]);
 
   useEffect(() => {
-    setStockPage((current) => Math.min(current, Math.max(0, Math.ceil(filteredStocks.length / pageSize) - 1)));
-  }, [filteredStocks.length]);
-
-  useEffect(() => {
-    setStockPage(0);
-  }, [stockSearch]);
-
-  useEffect(() => {
-    const loadDetails = async () => {
-      if (pagedStockSignature === lastLoadedSignatureRef.current) {
+    const loadVisibleData = async () => {
+      if (visibleStockSignature === lastLoadedSignatureRef.current) {
         return;
       }
 
-      lastLoadedSignatureRef.current = pagedStockSignature;
+      lastLoadedSignatureRef.current = visibleStockSignature;
 
-      if (!pagedStocks.length) {
+      if (!visibleStocks.length) {
         setDetailsMap((current) => (Object.keys(current).length === 0 ? current : {}));
         setDetailsLoading((current) => (current ? false : current));
+        setTableRows([]);
+        setTableLoading(false);
         return;
       }
 
       setDetailsLoading(true);
+      setTableLoading(true);
       try {
-        const results = await Promise.all(
-          pagedStocks.map(async (stock) => {
-            const response = await getUserStock(stock.id);
-            return [stock.id, response.user_stock];
-          })
-        );
-        setDetailsMap((current) => ({ ...current, ...Object.fromEntries(results) }));
+        const [detailResults, tableResponse] = await Promise.all([
+          Promise.all(
+            visibleStocks.map(async (stock) => {
+              const response = await getUserStock(stock.id);
+              return [stock.id, response.user_stock];
+            })
+          ),
+          getPortfolioTableRows(
+            id,
+            visibleStocks.map((stock) => stock.id)
+          ),
+        ]);
+        setDetailsMap((current) => ({ ...current, ...Object.fromEntries(detailResults) }));
+        setTableRows(tableResponse.rows ?? []);
       } catch (detailError) {
-        onToast({ type: "error", message: "Unable to load detailed stock history." });
+        setTableRows([]);
+        onToast({ type: "error", message: "Unable to load portfolio analysis rows." });
       } finally {
         setDetailsLoading(false);
+        setTableLoading(false);
       }
     };
 
-    loadDetails();
-  }, [onToast, pagedStockSignature]);
+    loadVisibleData();
+  }, [id, onToast, visibleStockSignature, visibleStocks]);
 
   useEffect(() => {
     if (!drawerOpen) {
@@ -229,9 +229,9 @@ export default function PortfolioView() {
 
       <section className="grid gap-6 xl:grid-cols-3">
         <div className="space-y-5 xl:col-span-2">
-          {loading || detailsLoading ? (
-            <div className="grid gap-4 lg:grid-cols-3">
-              {Array.from({ length: pageSize }).map((_, index) => <SkeletonBlock key={index} className="h-64" />)}
+          {loading || detailsLoading || tableLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 4 }).map((_, index) => <SkeletonBlock key={index} className="h-14 w-full" />)}
             </div>
           ) : stocks.length === 0 ? (
             <EmptyState
@@ -256,43 +256,13 @@ export default function PortfolioView() {
                   className="w-full rounded-panel border border-border bg-base px-11 py-2.5 text-sm text-text placeholder:text-muted focus:border-primary/40 focus:outline-none"
                 />
               </div>
-              <p className="text-sm text-muted">
-                Showing {pagedStocks.length === 0 ? 0 : currentStockPage * pageSize + 1}-
-                {Math.min((currentStockPage + 1) * pageSize, filteredStocks.length)} of {filteredStocks.length} stocks
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setStockPage((current) => Math.max(current - 1, 0))}
-                  disabled={currentStockPage === 0}
-                  aria-label="Previous stocks"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-panel border border-border bg-base text-text transition hover:border-primary/30 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStockPage((current) => Math.min(current + 1, filteredStockPages - 1))}
-                  disabled={currentStockPage >= filteredStockPages - 1}
-                  aria-label="Next stocks"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-panel border border-border bg-base text-text transition hover:border-primary/30 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
             </div>
 
-              <div className="grid gap-4 lg:grid-cols-3">
-                {pagedStocks.map((stock) => (
-                  <StockCard
-                    key={stock.id}
-                    stock={stock}
-                    detail={detailsMap[stock.id]}
-                    deleting={deletingId === stock.id}
-                    onDelete={handleDelete}
-                  />
-                ))}
-              </div>
+              <PortfolioStocksTable
+                rows={tableRows}
+                deletingId={deletingId}
+                onDelete={handleDelete}
+              />
             </div>
           )}
         </div>

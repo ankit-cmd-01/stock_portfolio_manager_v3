@@ -12,6 +12,7 @@ from stock_master.models import StockMaster
 from .models import UserStock
 from .serializers import UserStockDetailSerializer, UserStockSerializer
 from .services import fetch_and_save_historical_stock_data, sync_user_stock_history_if_stale
+from .table_service import build_portfolio_table_rows
 
 
 def get_user_stock(pk, user):
@@ -266,6 +267,71 @@ class UserStockByPortfolioView(APIView):
                 "portfolio": portfolio.title,
                 "count": user_stocks.count(),
                 "user_stocks": serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class UserStockPortfolioTableView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, portfolio_pk):
+        portfolio = Portfolio.objects.filter(pk=portfolio_pk, user=request.user).first()
+        if portfolio is None:
+            return Response(
+                {"error": "Portfolio not found or access denied"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        requested_ids = [
+            int(item)
+            for item in (request.GET.get("ids", "") or "").split(",")
+            if item.strip().isdigit()
+        ]
+
+        user_stocks = list(
+            UserStock.objects.filter(
+                user=request.user,
+                portfolio_id=portfolio_pk,
+                **({"id__in": requested_ids} if requested_ids else {}),
+            )
+            .select_related("stock", "portfolio")
+            .prefetch_related("stock_data")
+        )
+
+        if requested_ids:
+            order_lookup = {stock_id: index for index, stock_id in enumerate(requested_ids)}
+            user_stocks.sort(key=lambda stock: order_lookup.get(stock.id, len(order_lookup)))
+
+        for user_stock in user_stocks:
+            prefetched_rows = list(user_stock.stock_data.all())
+            latest_timestamp = prefetched_rows[-1].timestamp if prefetched_rows else None
+            try:
+                sync_user_stock_history_if_stale(
+                    user_stock,
+                    latest_timestamp=latest_timestamp,
+                )
+            except ValueError:
+                continue
+
+        refreshed_stocks = list(
+            UserStock.objects.filter(
+                user=request.user,
+                portfolio_id=portfolio_pk,
+                **({"id__in": requested_ids} if requested_ids else {}),
+            )
+            .select_related("stock", "portfolio")
+            .prefetch_related("stock_data")
+        )
+        if requested_ids:
+            order_lookup = {stock_id: index for index, stock_id in enumerate(requested_ids)}
+            refreshed_stocks.sort(key=lambda stock: order_lookup.get(stock.id, len(order_lookup)))
+
+        return Response(
+            {
+                "portfolio": portfolio.title,
+                "count": len(refreshed_stocks),
+                "rows": build_portfolio_table_rows(refreshed_stocks),
             },
             status=status.HTTP_200_OK,
         )

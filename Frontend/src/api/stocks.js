@@ -42,6 +42,18 @@ export const getPortfolioStocks = async (pk) => {
   return data;
 };
 
+export const getPortfolioTableRows = async (pk, stockIds = []) => {
+  const params = {};
+  if (stockIds.length > 0) {
+    params.ids = stockIds.join(",");
+  }
+  const { data } = await api.get(`/user_stocks/portfolio/${pk}/table/`, {
+    params,
+    timeout: 60000,
+  });
+  return data;
+};
+
 export const getPortfolioForecast = async (pk) => {
   const { data } = await api.get(`/api/portfolio/${pk}/forecast/`, {
     timeout: 30000,
