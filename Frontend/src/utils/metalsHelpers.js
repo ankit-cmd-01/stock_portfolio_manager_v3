@@ -3,19 +3,22 @@ export const metalLabelMap = {
   silver: "Silver",
 };
 
+const USD_TO_INR_RATE = 92.44;
+
 export function formatPrice(val, metal) {
   if (val === null || val === undefined || Number.isNaN(Number(val))) {
     return "--";
   }
 
+  const convertedValue = Number(val) * USD_TO_INR_RATE;
   const formatter = new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: "USD",
+    currency: "INR",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 
-  return formatter.format(Number(val));
+  return formatter.format(convertedValue);
 }
 
 export function formatChange(pct) {
