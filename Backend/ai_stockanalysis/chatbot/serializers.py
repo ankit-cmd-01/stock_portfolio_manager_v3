@@ -9,3 +9,8 @@ class ChatMessageSerializer(serializers.Serializer):
 class ChatRequestSerializer(serializers.Serializer):
     message = serializers.CharField(max_length=4000)
     history = ChatMessageSerializer(many=True, required=False, default=list)
+    response_mode = serializers.ChoiceField(
+        choices=["portfolio", "global"],
+        required=False,
+        default="global",
+    )

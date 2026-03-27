@@ -29,6 +29,33 @@ STOP_WORDS = {
     "with",
 }
 
+ACCOUNT_SCOPE_PHRASES = {
+    "account",
+    "holdings",
+    "my account",
+    "my holding",
+    "my holdings",
+    "my portfolio",
+    "my portfolios",
+    "our portfolio",
+    "portfolio",
+    "portfolios",
+    "saved data",
+    "saved portfolio",
+    "saved portfolios",
+    "tracked holding",
+    "tracked holdings",
+}
+
+GLOBAL_SCOPE_PHRASES = {
+    "across the market",
+    "globally",
+    "in the market",
+    "in the world",
+    "overall",
+    "worldwide",
+}
+
 
 def _normalize_text(value):
     return re.sub(r"[^a-z0-9]+", " ", (value or "").lower()).strip()
@@ -57,6 +84,124 @@ def _join_labels(values, limit=6):
         return ", ".join(cleaned)
     visible = ", ".join(cleaned[:limit])
     return f"{visible}, and {len(cleaned) - limit} more"
+
+
+def _contains_phrase(message, phrases):
+    normalized_message = _normalize_text(message)
+    return any(_normalize_text(phrase) in normalized_message for phrase in phrases)
+
+
+def _is_account_scoped(message):
+    normalized_message = _normalize_text(message)
+    if _contains_phrase(message, ACCOUNT_SCOPE_PHRASES):
+        return True
+
+    return any(token in normalized_message.split() for token in {"my", "mine", "our", "we"})
+
+
+def _is_global_scope(message):
+    return _contains_phrase(message, GLOBAL_SCOPE_PHRASES)
+
+
+def _answer_mode_guard(message, is_authenticated=False, user_context=None, response_mode="global"):
+    if response_mode != "global":
+        return None
+    if not is_authenticated:
+        return None
+    if not _is_account_scoped(message):
+        return None
+
+    return (
+        "You are in Global Market mode right now. Switch to My Portfolio mode if you want me to use "
+        "your saved holdings, portfolios, or account-specific performance data."
+    )
+
+
+def _answer_greeting(message, is_authenticated=False, user_context=None, response_mode="global"):
+    normalized_message = _normalize_text(message)
+    greetings = {"hello", "hey", "hi", "hii", "hola", "namaste", "good morning", "good evening"}
+    if normalized_message not in greetings:
+        return None
+
+    if is_authenticated:
+        first_name = user_context.get("snapshot", {}).get("user", {}).get("first_name") or "there"
+        return (
+            f"Hey {first_name}. I can help with your portfolios and holdings, "
+            f"and I can also answer broader stock-market questions. You are currently in "
+            f"{'My Portfolio' if response_mode == 'portfolio' else 'Global Market'} mode."
+        )
+
+    return (
+        "Hey. I can help with general stock-market questions here, "
+        "and if you log in I can also use your saved portfolios and holdings."
+    )
+
+
+def _answer_generic_best_stock_question(message, is_authenticated=False, user_context=None, response_mode="global"):
+    normalized_message = _normalize_text(message)
+    wants_best_stock = (
+        ("stock" in normalized_message or "stocks" in normalized_message)
+        and any(
+            phrase in normalized_message
+            for phrase in {
+                "best",
+                "maximum return",
+                "maximum returns",
+                "max return",
+                "max returns",
+                "top",
+            }
+        )
+    )
+    if not wants_best_stock or _is_account_scoped(message):
+        return None
+
+    return (
+        "There is no single best stock for everyone. The right pick depends on your time horizon, "
+        "risk tolerance, valuation, and whether you want growth, dividends, or stability. "
+        "If you want a lower-risk starting point, many investors prefer broad index ETFs. "
+        "If you want individual-stock ideas, tell me whether you want long-term growth, dividend, "
+        "large-cap, or higher-risk opportunities and I will narrow it down."
+    )
+
+
+def _answer_generic_market_term(message, is_authenticated=False, user_context=None, response_mode="global"):
+    normalized_message = _normalize_text(message)
+    knowledge_map = [
+        (
+            {"p e ratio", "pe ratio", "price earnings"},
+            "The P/E ratio compares a company's share price to its earnings per share. "
+            "A higher P/E often means the market expects faster growth, while a lower P/E can suggest slower growth, lower expectations, or a cheaper valuation.",
+        ),
+        (
+            {"market cap", "market capitalization"},
+            "Market cap means share price multiplied by total shares outstanding. "
+            "It is a quick way to judge a company's size, usually grouped into large-cap, mid-cap, and small-cap stocks.",
+        ),
+        (
+            {"dividend"},
+            "A dividend is cash a company pays shareholders, usually from profits. "
+            "Dividend investors often look for payout stability, yield, and whether earnings comfortably support the payout.",
+        ),
+        (
+            {"stock split", "split stock"},
+            "A stock split increases the number of shares while reducing the price per share proportionally, "
+            "so the company's total market value does not change just because of the split.",
+        ),
+        (
+            {"bull market"},
+            "A bull market is a period when prices trend higher and investor sentiment is generally optimistic.",
+        ),
+        (
+            {"bear market"},
+            "A bear market is a period of broad market decline, usually linked with weaker sentiment, slower growth, or rising risk.",
+        ),
+    ]
+
+    for phrases, answer in knowledge_map:
+        if any(phrase in normalized_message for phrase in phrases):
+            return answer
+    return None
 
 
 def _match_portfolio(message, portfolios):
@@ -109,6 +254,11 @@ def _answer_best_or_worst_stock(message, snapshot):
 
     portfolios = snapshot.get("portfolios", [])
     matched_portfolio = _match_portfolio(message, portfolios)
+    if _is_global_scope(message) and not matched_portfolio:
+        return None
+    if not matched_portfolio and not _is_account_scoped(message):
+        return None
+
     holdings = _holdings_for_portfolio(snapshot, matched_portfolio.get("title") if matched_portfolio else None)
     ranked = _rank_holdings_by_change(holdings, reverse=not wants_worst)
 
@@ -224,9 +374,32 @@ def _answer_best_portfolio(message, snapshot):
     )
 
 
-def generate_local_chat_reply(*, is_authenticated, user_context, message):
+def generate_local_chat_reply(*, is_authenticated, user_context, message, response_mode):
+    generic_responders = [
+        _answer_mode_guard,
+        _answer_greeting,
+        _answer_generic_best_stock_question,
+        _answer_generic_market_term,
+    ]
+
+    for responder in generic_responders:
+        reply = responder(
+            message,
+            is_authenticated=is_authenticated,
+            user_context=user_context,
+            response_mode=response_mode,
+        )
+        if reply:
+            return reply
+
     if not is_authenticated:
         return None
+
+    if response_mode == "global":
+        return (
+            "I can help with broader stock-market questions in Global Market mode. "
+            "If you want answers based on your saved holdings or portfolios, switch to My Portfolio mode."
+        )
 
     snapshot = user_context.get("snapshot", {})
     if not snapshot:
@@ -250,10 +423,7 @@ def generate_local_chat_reply(*, is_authenticated, user_context, message):
     if not portfolios and not holdings:
         return "You are logged in, but I do not see any saved portfolio data in your account yet."
 
-    portfolio_titles = _join_labels([portfolio["title"] for portfolio in portfolios], limit=5)
-    holding_tickers = _join_labels([holding["ticker"] for holding in holdings], limit=8)
     return (
-        f"I can use your saved account data here. I currently see portfolios such as {portfolio_titles} "
-        f"and holdings like {holding_tickers}. Ask me about the best or worst stock, portfolio summaries, "
-        f"or which stocks you hold in a portfolio."
+        "I can help with both your saved portfolio data and broader stock-market questions. "
+        "Try asking for a portfolio summary, your best or worst holding, or a general market concept."
     )

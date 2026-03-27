@@ -17,5 +17,6 @@ class ChatbotView(APIView):
             user=request.user,
             message=serializer.validated_data["message"],
             history=serializer.validated_data.get("history", []),
+            response_mode=serializer.validated_data.get("response_mode", "global"),
         )
         return Response(result)

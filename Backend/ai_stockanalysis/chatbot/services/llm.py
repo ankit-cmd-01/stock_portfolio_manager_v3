@@ -28,11 +28,12 @@ def _resolve_provider_config():
     return None
 
 
-def _fallback_payload(*, is_authenticated, user_context, message, error_message=None):
+def _fallback_payload(*, is_authenticated, user_context, message, response_mode, error_message=None):
     local_reply = generate_local_chat_reply(
         is_authenticated=is_authenticated,
         user_context=user_context,
         message=message,
+        response_mode=response_mode,
     )
     if local_reply:
         return {
@@ -41,6 +42,16 @@ def _fallback_payload(*, is_authenticated, user_context, message, error_message=
         }
 
     if is_authenticated:
+        if response_mode == "global":
+            return {
+                "reply": (
+                    "I could not reach the configured AI provider right now. "
+                    "I can still help with broad stock-market questions, and you can switch to My Portfolio mode "
+                    "if you want account-specific answers."
+                ),
+                "provider": "fallback",
+            }
+
         holdings = user_context.get("snapshot", {}).get("holdings", [])
         portfolios = user_context.get("snapshot", {}).get("portfolios", [])
         if not holdings:
@@ -58,16 +69,15 @@ def _fallback_payload(*, is_authenticated, user_context, message, error_message=
             return {
                 "reply": (
                     f"I could not reach the configured AI provider right now. "
-                    f"From your account, I can still see portfolios such as {portfolio_titles} and holdings like {holding_list}. "
-                    f"Your last message was: '{message}'."
+                    "I can still help with basic stock-market guidance and answers from your saved account data. "
+                    f"If you want account-specific help, I can use portfolios such as {portfolio_titles} and holdings like {holding_list}."
                 ),
                 "provider": "fallback",
             }
         return {
             "reply": (
-                f"You are logged in, and I can access your account data. "
-                f"I can see portfolios such as {portfolio_titles} and holdings like {holding_list}. "
-                f"Once the AI provider responds normally, I will answer this in a more conversational way."
+                "I can help with broader stock-market questions and with your saved account data. "
+                f"For account-specific answers, I can use portfolios such as {portfolio_titles} and holdings like {holding_list}."
             ),
             "provider": "fallback",
         }
@@ -89,13 +99,14 @@ def _fallback_payload(*, is_authenticated, user_context, message, error_message=
     }
 
 
-def generate_chat_reply(*, system_prompt, context_text, history, message, is_authenticated, user_context):
+def generate_chat_reply(*, system_prompt, context_text, history, message, is_authenticated, user_context, response_mode):
     provider = _resolve_provider_config()
     if not provider:
         return _fallback_payload(
             is_authenticated=is_authenticated,
             user_context=user_context,
             message=message,
+            response_mode=response_mode,
         )
 
     messages = [{"role": "system", "content": system_prompt}]
@@ -148,6 +159,7 @@ def generate_chat_reply(*, system_prompt, context_text, history, message, is_aut
             is_authenticated=is_authenticated,
             user_context=user_context,
             message=message,
+            response_mode=response_mode,
             error_message=str(exc),
         )
     except Exception as exc:
@@ -156,5 +168,6 @@ def generate_chat_reply(*, system_prompt, context_text, history, message, is_aut
             is_authenticated=is_authenticated,
             user_context=user_context,
             message=message,
+            response_mode=response_mode,
             error_message=str(exc),
         )
