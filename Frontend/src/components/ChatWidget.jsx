@@ -260,169 +260,180 @@ export default function ChatWidget() {
     : "pointer-events-auto flex h-[min(40rem,calc(100dvh-2.5rem))] w-[min(92vw,22rem)] flex-col overflow-hidden rounded-modal border border-border bg-elevated shadow-panel sm:h-[min(40rem,calc(100dvh-3rem))]";
 
   return (
-    <div className={containerClassName}>
+    <>
       {open ? (
-        <section className={panelClassName}>
-          <header className="flex items-center justify-between border-b border-border px-4 py-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-panel bg-primary/10 text-primary">
-                <Bot size={17} />
-              </div>
-              <div>
-                <p className="font-display text-[1.1rem] text-text">StockPilot Chat</p>
-                <p className="text-[11px] text-muted">
-                  {personalizedMode ? "Personalized mode" : "Guest mode"}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={toggleFullscreen}
-                className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-panel border border-border bg-base text-muted transition duration-150 hover:border-primary/30 hover:text-text active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-                aria-label={fullscreen ? "Exit full screen chat" : "Open full screen chat"}
-              >
-                {fullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-              </button>
-              <button
-                type="button"
-                onClick={closeChat}
-                className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-panel border border-border bg-base text-muted transition duration-150 hover:border-primary/30 hover:text-text active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-                aria-label="Close chat"
-              >
-                <X size={16} />
-              </button>
-            </div>
-          </header>
-
-          <div className="border-b border-border/80 px-4 py-3">
-            <div className="grid grid-cols-2 gap-2 rounded-2xl border border-border bg-base p-1">
-              <button
-                type="button"
-                onClick={() => handleModeChange("portfolio")}
-                disabled={!personalizedMode}
-                className={`rounded-xl px-3 py-2 text-[11px] font-semibold transition ${
-                  responseMode === "portfolio"
-                    ? "bg-primary text-slate-950 shadow-cyan"
-                    : "text-muted"
-                } ${!personalizedMode ? "cursor-not-allowed opacity-45" : ""}`}
-                title={personalizedMode ? "Use saved portfolio data" : "Log in to use My Portfolio mode"}
-              >
-                My Portfolio
-              </button>
-              <button
-                type="button"
-                onClick={() => handleModeChange("global")}
-                className={`rounded-xl px-3 py-2 text-[11px] font-semibold transition ${
-                  responseMode === "global"
-                    ? "bg-primary text-slate-950 shadow-cyan"
-                    : "text-muted"
-                }`}
-              >
-                Global Market
-              </button>
-            </div>
-            <p className="mt-2 px-1 text-[11px] text-muted">{modeHelperText}</p>
-          </div>
-
-          <div ref={listRef} className="scrollbar-thin min-h-0 flex-1 overflow-y-auto px-4 py-4">
-            <div className="flex flex-col gap-3">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`max-w-[88%] rounded-panel px-4 py-3 text-[0.95rem] leading-6 ${
-                    message.role === "user"
-                      ? "ml-auto bg-primary text-slate-950"
-                      : "border border-white/5 bg-base text-text"
-                  } break-words`}
-                >
-                  {message.content}
-                </div>
-              ))}
-
-              {typingReply ? (
-                <div className="max-w-[88%] rounded-panel border border-white/5 bg-base px-4 py-3 text-[0.95rem] leading-6 text-text break-words">
-                  {typingReply.visibleContent}
-                  <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse bg-primary align-[-2px]" />
-                </div>
-              ) : null}
-
-              {sending && !typingReply ? (
-                <div className="inline-flex max-w-[88%] items-center gap-2 rounded-panel border border-white/5 bg-base px-4 py-3 text-sm text-muted">
-                  <LoaderCircle size={16} className="animate-spin" />
-                  Thinking...
-                </div>
-              ) : null}
-            </div>
-          </div>
-
-          <footer className="border-t border-border px-4 py-4">
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <div>
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted/80">
-                    Quick Prompts
-                  </p>
-                  {!fullscreen ? (
-                    <p className="text-[10px] text-muted/70">Scroll for more</p>
-                  ) : null}
-                </div>
-                <div className={promptLayoutClassName}>
-                  {suggestedPrompts.map((prompt) => (
-                    <button
-                      key={prompt}
-                      type="button"
-                      onClick={() => handlePromptClick(prompt)}
-                      disabled={sending}
-                      className={promptButtonClassName}
-                    >
-                      {prompt}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <textarea
-                value={input}
-                onChange={(event) => setInput(event.target.value)}
-                onKeyDown={handleInputKeyDown}
-                rows={fullscreen ? 4 : 2}
-                placeholder={
-                  responseMode === "portfolio" && personalizedMode
-                    ? "Ask about your portfolios, holdings, performance, or account summary..."
-                    : "Ask any stock-market or investing question..."
-                }
-                className="w-full resize-none rounded-panel border border-border bg-base px-4 py-3 text-[0.95rem] text-text outline-none transition focus:border-primary/40"
-              />
-
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-[11px] text-muted">
-                  <Sparkles size={14} className="text-primary" />
-                  <span>{meta.provider ? `${meta.provider} | ${meta.engine}` : "AI assistant"}</span>
-                </div>
-                <button
-                  type="submit"
-                  disabled={sending || !input.trim()}
-                  className="inline-flex items-center gap-2 rounded-panel bg-primary px-4 py-2.5 text-[0.95rem] font-semibold text-slate-950 transition hover:shadow-cyan disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <Send size={14} />
-                  Send
-                </button>
-              </div>
-            </form>
-          </footer>
-        </section>
+        <button
+          type="button"
+          aria-label="Close chat overlay"
+          onClick={closeChat}
+          className="fixed inset-0 z-[59] cursor-default bg-transparent"
+        />
       ) : null}
 
-      <button
-        type="button"
-        onPointerDown={handleOpenPointerDown}
-        onClick={openChat}
-        className="pointer-events-auto inline-flex h-12 w-12 cursor-pointer touch-manipulation items-center justify-center rounded-full border border-primary/30 bg-primary text-slate-950 shadow-cyan transition duration-150 hover:-translate-y-0.5 hover:scale-[1.06] hover:border-primary/60 hover:shadow-[0_0_30px_rgba(34,211,238,0.45)] active:scale-95 active:shadow-[0_0_20px_rgba(34,211,238,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 sm:h-[3.2rem] sm:w-[3.2rem]"
-        aria-label="Open chatbot"
-      >
-        <MessageSquare size={18} />
-      </button>
-    </div>
+      <div className={containerClassName}>
+        {open ? (
+          <section className={panelClassName}>
+            <header className="flex items-center justify-between border-b border-border px-4 py-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-panel bg-primary/10 text-primary">
+                  <Bot size={17} />
+                </div>
+                <div>
+                  <p className="font-display text-[1.1rem] text-text">StockPilot Chat</p>
+                  <p className="text-[11px] text-muted">
+                    {personalizedMode ? "Personalized mode" : "Guest mode"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={toggleFullscreen}
+                  className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-panel border border-border bg-base text-muted transition duration-150 hover:border-primary/30 hover:text-text active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                  aria-label={fullscreen ? "Exit full screen chat" : "Open full screen chat"}
+                >
+                  {fullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeChat}
+                  className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-panel border border-border bg-base text-muted transition duration-150 hover:border-primary/30 hover:text-text active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                  aria-label="Close chat"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </header>
+
+            <div className="border-b border-border/80 px-4 py-3">
+              <div className="grid grid-cols-2 gap-2 rounded-2xl border border-border bg-base p-1">
+                <button
+                  type="button"
+                  onClick={() => handleModeChange("portfolio")}
+                  disabled={!personalizedMode}
+                  className={`rounded-xl px-3 py-2 text-[11px] font-semibold transition ${
+                    responseMode === "portfolio"
+                      ? "bg-primary text-slate-950 shadow-cyan"
+                      : "text-muted"
+                  } ${!personalizedMode ? "cursor-not-allowed opacity-45" : ""}`}
+                  title={personalizedMode ? "Use saved portfolio data" : "Log in to use My Portfolio mode"}
+                >
+                  My Portfolio
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleModeChange("global")}
+                  className={`rounded-xl px-3 py-2 text-[11px] font-semibold transition ${
+                    responseMode === "global"
+                      ? "bg-primary text-slate-950 shadow-cyan"
+                      : "text-muted"
+                  }`}
+                >
+                  Global Market
+                </button>
+              </div>
+              <p className="mt-2 px-1 text-[11px] text-muted">{modeHelperText}</p>
+            </div>
+
+            <div ref={listRef} className="scrollbar-thin min-h-0 flex-1 overflow-y-auto px-4 py-4">
+              <div className="flex flex-col gap-3">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`max-w-[88%] rounded-panel px-4 py-3 text-[0.95rem] leading-6 ${
+                      message.role === "user"
+                        ? "ml-auto bg-primary text-slate-950"
+                        : "border border-white/5 bg-base text-text"
+                    } break-words`}
+                  >
+                    {message.content}
+                  </div>
+                ))}
+
+                {typingReply ? (
+                  <div className="max-w-[88%] rounded-panel border border-white/5 bg-base px-4 py-3 text-[0.95rem] leading-6 text-text break-words">
+                    {typingReply.visibleContent}
+                    <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse bg-primary align-[-2px]" />
+                  </div>
+                ) : null}
+
+                {sending && !typingReply ? (
+                  <div className="inline-flex max-w-[88%] items-center gap-2 rounded-panel border border-white/5 bg-base px-4 py-3 text-sm text-muted">
+                    <LoaderCircle size={16} className="animate-spin" />
+                    Thinking...
+                  </div>
+                ) : null}
+              </div>
+            </div>
+
+            <footer className="border-t border-border px-4 py-4">
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <div>
+                  <div className="mb-2 flex items-center justify-between gap-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted/80">
+                      Quick Prompts
+                    </p>
+                    {!fullscreen ? (
+                      <p className="text-[10px] text-muted/70">Scroll for more</p>
+                    ) : null}
+                  </div>
+                  <div className={promptLayoutClassName}>
+                    {suggestedPrompts.map((prompt) => (
+                      <button
+                        key={prompt}
+                        type="button"
+                        onClick={() => handlePromptClick(prompt)}
+                        disabled={sending}
+                        className={promptButtonClassName}
+                      >
+                        {prompt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <textarea
+                  value={input}
+                  onChange={(event) => setInput(event.target.value)}
+                  onKeyDown={handleInputKeyDown}
+                  rows={fullscreen ? 4 : 2}
+                  placeholder={
+                    responseMode === "portfolio" && personalizedMode
+                      ? "Ask about your portfolios, holdings, performance, or account summary..."
+                      : "Ask any stock-market or investing question..."
+                  }
+                  className="w-full resize-none rounded-panel border border-border bg-base px-4 py-3 text-[0.95rem] text-text outline-none transition focus:border-primary/40"
+                />
+
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 text-[11px] text-muted">
+                    <Sparkles size={14} className="text-primary" />
+                    <span>{meta.provider ? `${meta.provider} | ${meta.engine}` : "AI assistant"}</span>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={sending || !input.trim()}
+                    className="inline-flex items-center gap-2 rounded-panel bg-primary px-4 py-2.5 text-[0.95rem] font-semibold text-slate-950 transition hover:shadow-cyan disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <Send size={14} />
+                    Send
+                  </button>
+                </div>
+              </form>
+            </footer>
+          </section>
+        ) : null}
+
+        <button
+          type="button"
+          onPointerDown={handleOpenPointerDown}
+          onClick={openChat}
+          className="pointer-events-auto inline-flex h-12 w-12 cursor-pointer touch-manipulation items-center justify-center rounded-full border border-primary/30 bg-primary text-slate-950 shadow-cyan transition duration-150 hover:-translate-y-0.5 hover:scale-[1.06] hover:border-primary/60 hover:shadow-[0_0_30px_rgba(34,211,238,0.45)] active:scale-95 active:shadow-[0_0_20px_rgba(34,211,238,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 sm:h-[3.2rem] sm:w-[3.2rem]"
+          aria-label="Open chatbot"
+        >
+          <MessageSquare size={18} />
+        </button>
+      </div>
+    </>
   );
 }
