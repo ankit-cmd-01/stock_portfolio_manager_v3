@@ -135,17 +135,17 @@ export default function Sidebar({ user, onLogout, onOpenProfile, mobile = false 
             <Settings2 size={16} />
             <span>Profile Settings</span>
           </button>
+
+          <button
+            type="button"
+            onClick={onLogout}
+            className="flex w-full items-center gap-3 rounded-panel border border-white/8 bg-white/[0.02] px-4 py-3 text-[0.95rem] font-semibold text-muted transition hover:border-primary/20 hover:bg-white/[0.04] hover:text-text"
+          >
+            <LogOut size={16} />
+            <span>Logout</span>
+          </button>
         </div>
       </nav>
-
-      <button
-        type="button"
-        onClick={onLogout}
-        className="mt-auto flex items-center gap-3 rounded-panel border border-white/8 bg-white/[0.02] px-4 py-3 text-[0.95rem] font-semibold text-muted transition hover:border-primary/20 hover:bg-white/[0.04] hover:text-text"
-      >
-        <LogOut size={16} />
-        <span>Logout</span>
-      </button>
     </aside>
   );
 }
