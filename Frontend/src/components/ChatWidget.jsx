@@ -141,7 +141,7 @@ export default function ChatWidget() {
   return (
     <div className="pointer-events-none fixed bottom-5 right-5 z-[60] flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
       {open ? (
-        <section className="pointer-events-auto w-[min(92vw,22rem)] overflow-hidden rounded-modal border border-border bg-elevated shadow-panel">
+        <section className="pointer-events-auto flex h-[min(40rem,calc(100dvh-2.5rem))] w-[min(92vw,22rem)] flex-col overflow-hidden rounded-modal border border-border bg-elevated shadow-panel sm:h-[min(40rem,calc(100dvh-3rem))]">
           <header className="flex items-center justify-between border-b border-border px-4 py-3">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-panel bg-primary/10 text-primary">
@@ -164,26 +164,28 @@ export default function ChatWidget() {
             </button>
           </header>
 
-          <div ref={listRef} className="scrollbar-thin flex max-h-[440px] min-h-[300px] flex-col gap-3 overflow-y-auto px-4 py-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`max-w-[88%] rounded-panel px-4 py-3 text-[0.95rem] leading-6 ${
-                  message.role === "user"
-                    ? "ml-auto bg-primary text-slate-950"
-                    : "border border-white/5 bg-base text-text"
-                } break-words`}
-              >
-                {message.content}
-              </div>
-            ))}
+          <div ref={listRef} className="scrollbar-thin min-h-0 flex-1 overflow-y-auto px-4 py-4">
+            <div className="flex flex-col gap-3">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`max-w-[88%] rounded-panel px-4 py-3 text-[0.95rem] leading-6 ${
+                    message.role === "user"
+                      ? "ml-auto bg-primary text-slate-950"
+                      : "border border-white/5 bg-base text-text"
+                  } break-words`}
+                >
+                  {message.content}
+                </div>
+              ))}
 
-            {sending ? (
-              <div className="inline-flex max-w-[88%] items-center gap-2 rounded-panel border border-white/5 bg-base px-4 py-3 text-sm text-muted">
-                <LoaderCircle size={16} className="animate-spin" />
-                Thinking...
-              </div>
-            ) : null}
+              {sending ? (
+                <div className="inline-flex max-w-[88%] items-center gap-2 rounded-panel border border-white/5 bg-base px-4 py-3 text-sm text-muted">
+                  <LoaderCircle size={16} className="animate-spin" />
+                  Thinking...
+                </div>
+              ) : null}
+            </div>
           </div>
 
           <footer className="border-t border-border px-4 py-4">
