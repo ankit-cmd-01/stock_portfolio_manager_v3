@@ -23,6 +23,7 @@ def root_view(request):
             "user_stocks_base_url": "/user_stocks/",
             "metals_base_url": "/api/metals/",
             "advanced_base_url": "/api/advanced/",
+            "quality_stocks_base_url": "/api/quality-stocks/",
         }
     )
 
@@ -61,8 +62,9 @@ urlpatterns = [
     path("api/chat/", include("chatbot.urls")),
     path("api/metals/", include("metals.urls")),
     path("api/advanced/", include("advanced.urls")),
+    path("api/quality-stocks/", include("quality_stocks.urls")),
     re_path(
-        r"^(dashboard|portfolios|portfolio/.*|stock/.*|metals(?:/.*)?|advanced/.*|login)$",
+        r"^(dashboard|portfolios|portfolio/.*|stock/.*|metals(?:/.*)?|quality-stocks(?:/.*)?|advanced/.*|login)$",
         frontend_index_view,
         name="frontend-spa-route",
     ),

@@ -643,7 +643,6 @@ function AiSummaryView({
 export default function PortfolioInsightsPanel({
   portfolioId,
   stocks,
-  cachedDetailsMap,
   onToast,
 }) {
   const [activeTab, setActiveTab] = useState("recommendation");
@@ -663,10 +662,6 @@ export default function PortfolioInsightsPanel({
   const analyticsSignature = useMemo(
     () => stocks.map((stock) => `${stock.id}:${stock.quantity}:${stock.modified_at}`).join("|"),
     [stocks]
-  );
-  const combinedDetailsMap = useMemo(
-    () => ({ ...cachedDetailsMap, ...analyticsDetailsMap }),
-    [analyticsDetailsMap, cachedDetailsMap]
   );
 
   useEffect(() => {
@@ -695,7 +690,7 @@ export default function PortfolioInsightsPanel({
     }
 
     const missingStocks = stocks.filter(
-      (stock) => !Array.isArray(combinedDetailsMap?.[stock.id]?.stock_data)
+      (stock) => !Array.isArray(analyticsDetailsMap?.[stock.id]?.stock_data)
     );
 
     if (!missingStocks.length) {
@@ -736,7 +731,7 @@ export default function PortfolioInsightsPanel({
     }
 
     setAnalyticsLoading(false);
-  }, [analyticsLoading, analyticsSignature, combinedDetailsMap, stocks]);
+  }, [analyticsDetailsMap, analyticsLoading, analyticsSignature, stocks]);
 
   const ensureForecast = useCallback(
     async ({ force = false, announce = false } = {}) => {
@@ -831,8 +826,8 @@ export default function PortfolioInsightsPanel({
   }, [activeTab, ensureAiSummary, ensureAnalyticsDetails, ensureForecast]);
 
   const analyticsStocks = useMemo(
-    () => buildPortfolioAnalytics(stocks, combinedDetailsMap, forecastData),
-    [combinedDetailsMap, forecastData, stocks]
+    () => buildPortfolioAnalytics(stocks, analyticsDetailsMap, forecastData),
+    [analyticsDetailsMap, forecastData, stocks]
   );
   const recommendationRows = useMemo(() => getRecommendationRows(analyticsStocks), [analyticsStocks]);
   const growthRows = useMemo(() => getGrowthRows(analyticsStocks), [analyticsStocks]);

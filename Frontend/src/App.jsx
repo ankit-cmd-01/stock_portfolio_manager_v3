@@ -25,6 +25,7 @@ import Landing from "./pages/Landing";
 import MetalDetailPage from "./pages/MetalDetailPage";
 import MetalsPage from "./pages/MetalsPage";
 import PortfolioView from "./pages/PortfolioView";
+import QualityStocksPage from "./pages/QualityStocksPage";
 import StockDetail from "./pages/StockDetail";
 
 function ProtectedRoute() {
@@ -111,6 +112,7 @@ function AppRoutes({ onToast }) {
         <Route element={<ProtectedLayout onToast={onToast} />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/portfolios" element={<Dashboard />} />
+          <Route path="/quality-stocks" element={<QualityStocksPage />} />
           <Route path="/metals" element={<MetalsPage />} />
           <Route path="/metals/:metal" element={<MetalDetailPage />} />
           <Route path="/portfolio/:id" element={<PortfolioView />} />

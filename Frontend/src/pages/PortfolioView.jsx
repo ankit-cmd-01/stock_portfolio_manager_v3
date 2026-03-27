@@ -1,11 +1,10 @@
 import { Plus, Search } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useAppToast } from "../App";
 import {
   createUserStock,
-  getUserStock,
   getPortfolioTableRows,
   removeUserStock,
   searchStockMaster,
@@ -24,8 +23,6 @@ export default function PortfolioView() {
   const { id } = useParams();
   const { onToast } = useAppToast();
   const { portfolios, portfolioData, loading, error, reload } = usePortfolio(id);
-  const [detailsMap, setDetailsMap] = useState({});
-  const [detailsLoading, setDetailsLoading] = useState(true);
   const [tableRows, setTableRows] = useState([]);
   const [tableLoading, setTableLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -59,61 +56,34 @@ export default function PortfolioView() {
     () => visibleStocks.map((stock) => stock.id).join("|"),
     [visibleStocks]
   );
-  const lastLoadedSignatureRef = useRef("");
 
   useEffect(() => {
-    lastLoadedSignatureRef.current = "";
-  }, [id]);
-
-  useEffect(() => {
-    const loadVisibleData = async () => {
-      if (visibleStockSignature === lastLoadedSignatureRef.current) {
-        return;
-      }
-
-      lastLoadedSignatureRef.current = visibleStockSignature;
-
+    const loadTableData = async () => {
       if (!visibleStocks.length) {
-        setDetailsMap((current) => (Object.keys(current).length === 0 ? current : {}));
-        setDetailsLoading((current) => (current ? false : current));
         setTableRows([]);
         setTableLoading(false);
         return;
       }
 
-      setDetailsLoading(true);
       setTableLoading(true);
-      const [detailResults, tableResult] = await Promise.allSettled([
-        Promise.all(
-          visibleStocks.map(async (stock) => {
-            const response = await getUserStock(stock.id);
-            return [stock.id, response.user_stock];
-          })
-        ),
+      const tableResult = await Promise.allSettled([
         getPortfolioTableRows(
           id,
           visibleStocks.map((stock) => stock.id)
         ),
       ]);
 
-      if (detailResults.status === "fulfilled") {
-        setDetailsMap((current) => ({ ...current, ...Object.fromEntries(detailResults.value) }));
-      } else {
-        onToast({ type: "error", message: "Detailed chart data could not be loaded for some stocks." });
-      }
-
-      if (tableResult.status === "fulfilled") {
-        setTableRows(tableResult.value.rows ?? []);
+      if (tableResult[0].status === "fulfilled") {
+        setTableRows(tableResult[0].value.rows ?? []);
       } else {
         setTableRows([]);
         onToast({ type: "error", message: "Unable to load portfolio analysis rows." });
       }
 
-      setDetailsLoading(false);
       setTableLoading(false);
     };
 
-    loadVisibleData();
+    loadTableData();
   }, [id, onToast, visibleStockSignature, visibleStocks]);
 
   useEffect(() => {
@@ -235,7 +205,7 @@ export default function PortfolioView() {
 
       <section className="space-y-6">
         <div className="space-y-5">
-          {loading || detailsLoading || tableLoading ? (
+          {loading || tableLoading ? (
             <div className="space-y-3">
               {Array.from({ length: 4 }).map((_, index) => <SkeletonBlock key={index} className="h-14 w-full" />)}
             </div>
@@ -277,7 +247,6 @@ export default function PortfolioView() {
           <PortfolioInsightsPanel
             portfolioId={id}
             stocks={stocks}
-            cachedDetailsMap={detailsMap}
             onToast={onToast}
           />
           {false ? (

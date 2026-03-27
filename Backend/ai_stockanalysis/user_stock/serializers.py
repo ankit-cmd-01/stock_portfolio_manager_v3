@@ -65,6 +65,9 @@ class UserStockSerializer(serializers.ModelSerializer):
         return obj.portfolio.title
 
     def get_data_count(self, obj):
+        annotated_count = getattr(obj, "data_count", None)
+        if annotated_count is not None:
+            return annotated_count
         prefetched = getattr(obj, "_prefetched_objects_cache", {})
         if "stock_data" in prefetched:
             return len(prefetched["stock_data"])

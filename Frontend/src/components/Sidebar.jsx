@@ -6,6 +6,7 @@ import { resolveBackendUrl } from "../config/runtime";
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/portfolios", label: "My Portfolios", icon: BriefcaseBusiness },
+  { to: "/quality-stocks", label: "Quality Stocks", icon: Sparkles },
   { to: "/metals", label: "Metals", icon: Coins },
 ];
 

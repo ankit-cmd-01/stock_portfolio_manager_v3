@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from advanced.services.finbert_service import batch_analyze
 from advanced.services.news_scraper import _safe_fetch, article_matches_company
 from django.utils import timezone
+from advanced.models import OverallSentimentCache
 
 
 logger = logging.getLogger(__name__)
@@ -141,6 +142,40 @@ def _score_sentiment(articles):
     }
 
 
+def _cached_sentiment_lookup(user_stocks):
+    candidate_map = {}
+    normalized_candidates = set()
+
+    for user_stock in user_stocks:
+        candidates = _build_ticker_candidates(user_stock)
+        if not candidates:
+            candidates = [user_stock.stock.yahoo_ticker or user_stock.stock.ticker]
+        candidate_map[user_stock.id] = [(candidate or "").strip().upper() for candidate in candidates if candidate]
+        normalized_candidates.update(candidate_map[user_stock.id])
+
+    cache_lookup = {
+        (item.ticker or "").strip().upper(): item
+        for item in OverallSentimentCache.objects.filter(ticker__in=normalized_candidates)
+    }
+
+    sentiment_lookup = {}
+    for user_stock in user_stocks:
+        matched = None
+        for candidate in candidate_map.get(user_stock.id, []):
+            matched = cache_lookup.get(candidate)
+            if matched is not None:
+                break
+        if matched is None:
+            continue
+        sentiment_lookup[user_stock.id] = {
+            "sentiment": (matched.overall_sentiment or "NEUTRAL").upper(),
+            "sentiment_score": round((matched.positive_pct - matched.negative_pct) / 100.0, 4),
+            "news_count": matched.article_count or 0,
+        }
+
+    return sentiment_lookup
+
+
 def _linear_regression_forecast(prices):
     series = [_to_float(price) for price in prices if _to_float(price) > 0]
     if not series:
@@ -186,12 +221,16 @@ def _signal_from_prices(current_price, predicted_price):
     return "SELL"
 
 
-def _build_row(user_stock):
+def _build_row(user_stock, sentiment_lookup=None):
     history = list(user_stock.stock_data.all())
     closes = [_to_float(item.close) for item in history if _to_float(item.close) > 0]
+    cached_sentiment = (sentiment_lookup or {}).get(user_stock.id)
     if not closes:
-        articles = _match_economic_times_articles(user_stock)
-        sentiment = _score_sentiment(articles)
+        sentiment = cached_sentiment or {
+            "sentiment": "NEUTRAL",
+            "sentiment_score": 0.0,
+            "news_count": 0,
+        }
         ticker = user_stock.stock.yahoo_ticker or user_stock.stock.ticker
         return {
             "user_stock_id": user_stock.id,
@@ -220,8 +259,11 @@ def _build_row(user_stock):
     change_pct = ((predicted_price - current_price) / current_price) * 100 if current_price > 0 else 0.0
     discount_pct = ((recent_max - current_price) / recent_max) * 100 if recent_max > 0 else 0.0
 
-    articles = _match_economic_times_articles(user_stock)
-    sentiment = _score_sentiment(articles)
+    if cached_sentiment is not None:
+        sentiment = cached_sentiment
+    else:
+        articles = _match_economic_times_articles(user_stock)
+        sentiment = _score_sentiment(articles)
     ticker = user_stock.stock.yahoo_ticker or user_stock.stock.ticker
 
     return {
@@ -243,10 +285,11 @@ def _build_row(user_stock):
 
 
 def build_portfolio_table_rows(user_stocks):
+    sentiment_lookup = _cached_sentiment_lookup(user_stocks)
     rows = []
     for user_stock in user_stocks:
         try:
-            rows.append(_build_row(user_stock))
+            rows.append(_build_row(user_stock, sentiment_lookup=sentiment_lookup))
         except Exception as exc:
             ticker = user_stock.stock.yahoo_ticker or user_stock.stock.ticker
             logger.warning("Portfolio table row build failed for %s: %s", ticker, exc)

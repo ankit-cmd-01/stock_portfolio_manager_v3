@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "chatbot",
     "metals",
     "advanced",
+    "quality_stocks",
 ]
 
 if importlib.util.find_spec("django_apscheduler") is not None:

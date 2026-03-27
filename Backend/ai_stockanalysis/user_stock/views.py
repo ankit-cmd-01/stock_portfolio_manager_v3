@@ -1,5 +1,5 @@
 from django.db import IntegrityError
-from django.db.models import Q
+from django.db.models import Count, Prefetch, Q
 from decimal import Decimal, InvalidOperation
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from portfolio.models import Portfolio
 from stock_master.models import StockMaster
 
-from .models import UserStock
+from .models import UserStock, UserStockData
 from .serializers import UserStockDetailSerializer, UserStockSerializer
 from .services import fetch_and_save_historical_stock_data, sync_user_stock_history_if_stale
 from .table_service import build_portfolio_table_rows
@@ -42,7 +42,7 @@ class UserStockListCreateView(APIView):
         user_stocks = (
             UserStock.objects.filter(user=request.user)
             .select_related("stock", "portfolio")
-            .prefetch_related("stock_data")
+            .annotate(data_count=Count("stock_data"))
         )
         serializer = UserStockSerializer(user_stocks, many=True)
         return Response(
@@ -238,28 +238,10 @@ class UserStockByPortfolioView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        user_stocks = list(
-            UserStock.objects.filter(user=request.user, portfolio_id=portfolio_pk)
-            .select_related("stock", "portfolio")
-            .prefetch_related("stock_data")
-        )
-        for user_stock in user_stocks:
-            latest_timestamp = None
-            prefetched_rows = list(user_stock.stock_data.all())
-            if prefetched_rows:
-                latest_timestamp = prefetched_rows[-1].timestamp
-            try:
-                sync_user_stock_history_if_stale(
-                    user_stock,
-                    latest_timestamp=latest_timestamp,
-                )
-            except ValueError:
-                continue
-
         user_stocks = (
             UserStock.objects.filter(user=request.user, portfolio_id=portfolio_pk)
             .select_related("stock", "portfolio")
-            .prefetch_related("stock_data")
+            .annotate(data_count=Count("stock_data"))
         )
         serializer = UserStockSerializer(user_stocks, many=True)
         return Response(
@@ -296,42 +278,23 @@ class UserStockPortfolioTableView(APIView):
                 **({"id__in": requested_ids} if requested_ids else {}),
             )
             .select_related("stock", "portfolio")
-            .prefetch_related("stock_data")
+            .prefetch_related(
+                Prefetch(
+                    "stock_data",
+                    queryset=UserStockData.objects.only("user_stock_id", "timestamp", "close").order_by("timestamp"),
+                )
+            )
         )
 
         if requested_ids:
             order_lookup = {stock_id: index for index, stock_id in enumerate(requested_ids)}
             user_stocks.sort(key=lambda stock: order_lookup.get(stock.id, len(order_lookup)))
 
-        for user_stock in user_stocks:
-            prefetched_rows = list(user_stock.stock_data.all())
-            latest_timestamp = prefetched_rows[-1].timestamp if prefetched_rows else None
-            try:
-                sync_user_stock_history_if_stale(
-                    user_stock,
-                    latest_timestamp=latest_timestamp,
-                )
-            except ValueError:
-                continue
-
-        refreshed_stocks = list(
-            UserStock.objects.filter(
-                user=request.user,
-                portfolio_id=portfolio_pk,
-                **({"id__in": requested_ids} if requested_ids else {}),
-            )
-            .select_related("stock", "portfolio")
-            .prefetch_related("stock_data")
-        )
-        if requested_ids:
-            order_lookup = {stock_id: index for index, stock_id in enumerate(requested_ids)}
-            refreshed_stocks.sort(key=lambda stock: order_lookup.get(stock.id, len(order_lookup)))
-
         return Response(
             {
                 "portfolio": portfolio.title,
-                "count": len(refreshed_stocks),
-                "rows": build_portfolio_table_rows(refreshed_stocks),
+                "count": len(user_stocks),
+                "rows": build_portfolio_table_rows(user_stocks),
             },
             status=status.HTTP_200_OK,
         )
